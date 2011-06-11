@@ -1,16 +1,24 @@
-module Types.World ( World(..)
+module Types.World (
                    -- From Types.Entity
-                   , Entity(..)
-                   , getId
+                     getId
                    , onGCD
+                   , onCooldown
+                   , addCooldown
+                   , makeEntity
                    -- From Types.Common
                    , Damage
                    , Health
+                   , World(..)
+                   , Entity(..)
+                   , Event(..)
+                   , Ability(..)
                    ) where
 
 import Types.Common
 import Types.Entity
 
-data World = World { player :: Entity
-                   , target :: Entity
+{-
+data World = World { player :: !Entity
+                   , target :: !Entity
                    } deriving (Show)
+-}

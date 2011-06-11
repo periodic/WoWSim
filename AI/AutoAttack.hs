@@ -8,6 +8,7 @@ import AI.Info
 import Actions.Attacks
 
 autoAttack :: Event -> Sim World Event ()
+autoAttack (EvSimStart) = attack 100
 autoAttack (EvGcdEnd _) =
     do  ingcd <- playerOnGCD
         if (ingcd)
