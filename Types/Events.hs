@@ -1,7 +1,7 @@
 module Types.Events where
 
 import Types.Common
-import Types.EventId
+import Types.EntityId
 
 data Event = EvGcdEnd EntityId
            | EvSwingDamage EntityId EntityId Damage
