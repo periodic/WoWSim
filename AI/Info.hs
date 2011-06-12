@@ -1,7 +1,6 @@
 module AI.Info where
 
 import DisEvSim
-import Types.Events
 import Types.World
 
 playerOnGCD :: Sim World Event Bool

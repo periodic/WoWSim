@@ -1,17 +1,21 @@
 module AI.AutoAttack where
 
 import DisEvSim
-import Types.Events
 import Types.World
 import AI.Info
 
+import Actions.Common
 import Actions.Attacks
 
 autoAttack :: Event -> Sim World Event ()
-autoAttack (EvSimStart) = attack 100
+autoAttack (EvSimStart) = swing
 autoAttack (EvGcdEnd _) =
     do  ingcd <- playerOnGCD
         if (ingcd)
             then return ()
-            else attack 100
+            else swing
 autoAttack _ = return ()
+
+swing = do
+    resetGCD
+    attack 100

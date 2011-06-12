@@ -1,24 +1,22 @@
 module AI.Warrior where
 
 import DisEvSim
-import Types.Events
 import Types.World
 import AI.Info
 
+import Actions.Common
 import Actions.Attacks
 
 warrior :: Event -> Sim World Event ()
-warrior (EvSimStart)        = attack 100
+warrior (EvSimStart)        = rotation
 warrior (EvGcdEnd _)        = rotation
 warrior (EvCooldownExpire)  = rotation
 warrior _                   = return ()
 
-
-
 rotation = do
     ingcd <- playerOnGCD
     oncd  <- playerAbilOnCooldown "Mortal Strike"
-    if (ingcd && oncd)
+    if (ingcd || oncd)
         then return ()
         else useAbility mortalStrike
     where

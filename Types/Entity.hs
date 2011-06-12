@@ -22,13 +22,13 @@ data Entity = Entity { eID        :: !EntityId
 makeEntity name = Entity (getIdFromString name) 0 0 empty
 
 onGCD :: Entity -> Time -> Bool
-onGCD e t = eGlobalCD e >= t
+onGCD e t = eGlobalCD e > t
 
 onCooldown :: Entity -> String -> Time -> Bool
 onCooldown e name t = 
     case Data.Map.lookup name (eCooldowns e) of
         Nothing -> False
-        Just t' -> t' >= t
+        Just t' -> t' > t
 
 addCooldown :: Entity -> String -> Time -> Entity
 addCooldown e name t =
