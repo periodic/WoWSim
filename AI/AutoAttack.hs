@@ -7,7 +7,7 @@ import AI.Info
 import Actions.Common
 import Actions.Attacks
 
-autoAttack :: Event -> Sim World Event ()
+autoAttack :: Event -> Action ()
 autoAttack (EvSimStart) = swing
 autoAttack (EvGcdEnd _) =
     do  ingcd <- playerOnGCD

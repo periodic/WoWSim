@@ -1,8 +1,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TemplateHaskell, DeriveDataTypeable #-}
-module Types.Common where
+module Types.Common  where
 
 import DisEvSim (Time, DTime, Sim)
 import Data.Map (Map(..))
+import Control.Monad.Reader
 
 -- For Data/Typable
 import Data.Data
@@ -15,10 +16,14 @@ import qualified Control.Category as Cat
 
 a <.> b = (Cat..) a b
 
+data ActionState = ActionState { actionSource :: Entity
+                               , actionTarget :: Entity
+                               } deriving (Show)
+
+type Action = ReaderT ActionState (Sim World Event)
+
 type Health = Integer
 type Damage = Integer
-
-type Action = Sim World Event ()
 
 newtype EntityId = EntityId String
                    deriving (Eq)
@@ -51,7 +56,7 @@ type AbilityId = String
 data Ability = Ability { abilName       :: String
                        , abilCooldown   :: Maybe DTime
                        , abilTriggerGCD :: Bool
-                       , abilAction     :: Action
+                       , abilAction     :: Action ()
                        }
 
 {----------------------------------------

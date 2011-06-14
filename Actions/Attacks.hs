@@ -1,11 +1,10 @@
 module Actions.Attacks where
 
-import DisEvSim
 import Types.World
 
 import Actions.Common
 
-attack :: AbilityId -> Damage -> Sim World Event ()
+attack :: AbilityId -> Damage -> Action ()
 attack abilName dmg = do
     (World player target) <- getW
     t                     <- getT
@@ -14,7 +13,7 @@ attack abilName dmg = do
     putW (World player target')
 
 
-startAutoAttack :: EntityId -> DTime -> Damage -> Sim World Event ()
+startAutoAttack :: EntityId -> DTime -> Damage -> Action ()
 startAutoAttack owner timer dmg = do
     addHandler name autoAttackHandler
     after 0 (EvAutoAttackReady owner)

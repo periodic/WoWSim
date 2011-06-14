@@ -14,8 +14,16 @@ module Types.World (
                    , Event(..)
                    , Ability(..)
                    , AbilityId
+                   -- Action monad
+                   , Action
+                   , ActionState(..)
+                   -- DisEvSim
+                   , DTime
+                   , Time
+                   , Sim
                    ) where
 
+import DisEvSim (DTime, Time, Sim)
 import Types.Common
 import Types.Entity
 import Types.Event

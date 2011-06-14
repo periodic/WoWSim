@@ -10,6 +10,7 @@ import System.CPUTime
 
 import Data.List (intercalate)
 
+import Actions.Common
 import AI.AutoAttack
 import AI.Warrior
 
@@ -18,7 +19,8 @@ main = do
     let pEntity = makeEntity "Player"
         tEntity = makeEntity "Target"
         world   = World pEntity tEntity
-        (t, log, world') = {-# SCC "sim" #-} simulate world [("Warrior", warrior (eID pEntity))] EvSimStart (read dur)
+        ai      = transformHandler (warrior (eID pEntity)) (ActionState pEntity tEntity)
+        (t, log, world') = {-# SCC "sim" #-} simulate world [("Warrior", ai)] EvSimStart (read dur)
     putStrLn . showLog $ log
     print $ (t, eHealth . target $ world')
 

@@ -31,13 +31,13 @@ module Types.Stats ( Stats (..)
 
 import Prelude hiding (gcd)
 
-import DisEvSim (Time, DTime, Sim)
 import System.Random
 import Data.Data
 import Data.Typeable
 import Data.Map hiding (map)
 import Data.Record.Label
 
+import DisEvSim (DTime, Time, Sim)
 import Types.Common
 
 type HitFunc = Stats -> Stats -> StdGen -> (AttackResult, StdGen)

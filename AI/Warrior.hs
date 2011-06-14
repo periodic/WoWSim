@@ -7,7 +7,7 @@ import AI.Info
 import Actions.Common
 import Actions.Attacks
 
-warrior :: EntityId -> Event -> Sim World Event ()
+warrior :: EntityId -> Event -> Action ()
 warrior eid (EvSimStart)            = startAutoAttack eid 2.0 100 >> rotation eid
 warrior eid (EvGcdEnd _)            = rotation eid
 warrior eid (EvCooldownExpire _ _)  = rotation eid

@@ -1,15 +1,15 @@
 module AI.Info where
 
-import DisEvSim
 import Types.World
+import Actions.Common
 
-playerOnGCD :: Sim World Event Bool
+playerOnGCD :: Action Bool
 playerOnGCD =
     do  (World player _) <- getW
         t                <- getT
         return $ onGCD player t
 
-playerAbilOnCooldown :: String -> Sim World Event Bool
+playerAbilOnCooldown :: String -> Action Bool
 playerAbilOnCooldown name =
     do  (World player _) <- getW
         t                <- getT
