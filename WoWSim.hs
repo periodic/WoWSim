@@ -17,9 +17,9 @@ main = do
     [dur]   <- getArgs
     let pEntity = makeEntity "Player"
         tEntity = makeEntity "Target"
-    let world = World pEntity tEntity
-        (t, log, world') = {-# SCC "sim" #-} simulate world [("Warrior", warrior)] EvSimStart (read dur)
-    print $ (t, eHealth . target $ world')
+        world   = World pEntity tEntity
+        (t, log, world') = {-# SCC "sim" #-} simulate world [("Warrior", warrior (eID pEntity))] EvSimStart (read dur)
     putStrLn . showLog $ log
+    print $ (t, eHealth . target $ world')
 
 showLog = intercalate "\n" . map (\(t,e) -> show t ++ " - " ++ show e)

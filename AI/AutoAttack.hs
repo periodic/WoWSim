@@ -18,4 +18,4 @@ autoAttack _ = return ()
 
 swing = do
     resetGCD
-    attack 100
+    attack "AutoAttack" 100

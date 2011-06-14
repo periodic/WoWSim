@@ -5,21 +5,24 @@ import Types.World
 
 import Actions.Common
 
-attack :: Damage -> Sim World Event ()
-attack dmg = do
+attack :: AbilityId -> Damage -> Sim World Event ()
+attack abilName dmg = do
     (World player target) <- getW
     t                     <- getT
-    after 0 (EvSwingDamage (eID player) (eID target) dmg)
+    after 0 (EvSwingDamage (eID player) (eID target) abilName dmg)
     let target' = target { eHealth = eHealth target + dmg }
     putW (World player target')
 
 
-startAutoAttack :: DTime -> Damage -> Sim World Event ()
-startAutoAttack timer dmg = do
-    addHandler "AutoAttack" autoAttackHandler
-    after 0 EvAutoAttackReady
+startAutoAttack :: EntityId -> DTime -> Damage -> Sim World Event ()
+startAutoAttack owner timer dmg = do
+    addHandler name autoAttackHandler
+    after 0 (EvAutoAttackReady owner)
     where
-        autoAttackHandler EvAutoAttackReady = do 
-            attack dmg
-            after timer EvAutoAttackReady
-        autoAttackHandler _ = return()
+        name = "AutoAttack"
+        autoAttackHandler (EvAutoAttackReady eid) 
+            | eid == owner = do 
+                attack name dmg
+                after timer (EvAutoAttackReady owner)
+            | otherwise = return ()
+        autoAttackHandler _ = return ()

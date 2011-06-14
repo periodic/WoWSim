@@ -7,19 +7,13 @@ module Types.Entity ( Entity(..)
                     ) where
 
 import DisEvSim (DTime, Time)
-import Types.Common
-import Types.EntityId
 import Data.Map
 
-{-
-data Entity = Entity { eID        :: !EntityId
-                     , eHealth    :: !Health
-                     , eGlobalCD  :: !Time
-                     , eCooldowns :: !Map String Time
-                     } deriving (Show)
--}
+import Types.Common
+import Types.EntityId
+import Types.Stats
 
-makeEntity name = Entity (getIdFromString name) 0 0 empty
+makeEntity name = Entity (getIdFromString name) 0 0 empty defaultStats
 
 onGCD :: Entity -> Time -> Bool
 onGCD e t = eGlobalCD e > t

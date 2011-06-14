@@ -10,8 +10,10 @@ module Types.World (
                    , Health
                    , World(..)
                    , Entity(..)
+                   , EntityId(..)
                    , Event(..)
                    , Ability(..)
+                   , AbilityId
                    ) where
 
 import Types.Common

@@ -3,10 +3,8 @@ module Types.EntityId ( EntityId
                       , getIdFromString
                       ) where
 
+import Types.Common
 import System.Random (randomIO)
-
-newtype EntityId = EntityId String
-                  deriving (Show, Eq)
 
 getId :: IO EntityId
 getId =

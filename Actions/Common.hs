@@ -29,6 +29,6 @@ useAbility abil = do
         Nothing -> return ()
         Just dt -> do
             setCooldown (abilName abil) dt
-            after dt EvCooldownExpire
+            after dt (EvCooldownExpire (eID player) (abilName abil))
     abilAction abil
 

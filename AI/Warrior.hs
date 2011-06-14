@@ -7,22 +7,23 @@ import AI.Info
 import Actions.Common
 import Actions.Attacks
 
-warrior :: Event -> Sim World Event ()
-warrior (EvSimStart)        = startAutoAttack 2.0 100 >> rotation
-warrior (EvGcdEnd _)        = rotation
-warrior (EvCooldownExpire)  = rotation
-warrior _                   = return ()
+warrior :: EntityId -> Event -> Sim World Event ()
+warrior eid (EvSimStart)            = startAutoAttack eid 2.0 100 >> rotation eid
+warrior eid (EvGcdEnd _)            = rotation eid
+warrior eid (EvCooldownExpire _ _)  = rotation eid
+warrior eid _                       = return ()
 
-rotation = do
+rotation eid = do
     ingcd <- playerOnGCD
-    oncd  <- playerAbilOnCooldown "Mortal Strike"
+    oncd  <- playerAbilOnCooldown msName
     if (ingcd || oncd)
         then return ()
         else useAbility mortalStrike
     where
+        msName = "MortalStrike"
         mortalStrike =
-            Ability { abilName       = "Mortal Strike"
+            Ability { abilName       = msName
                     , abilCooldown   = Just 6
                     , abilTriggerGCD = True
-                    , abilAction     = attack 100
+                    , abilAction     = attack msName 100
                     }
