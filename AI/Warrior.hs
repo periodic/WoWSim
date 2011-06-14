@@ -8,7 +8,7 @@ import Actions.Common
 import Actions.Attacks
 
 warrior :: Event -> Sim World Event ()
-warrior (EvSimStart)        = rotation
+warrior (EvSimStart)        = startAutoAttack 2.0 100 >> rotation
 warrior (EvGcdEnd _)        = rotation
 warrior (EvCooldownExpire)  = rotation
 warrior _                   = return ()
