@@ -15,6 +15,7 @@ data Entity = Entity { eID        :: !EntityId
                      , eGlobalCD  :: !Time
                      , eCooldowns :: Map String Time
                      } deriving (Show)
+
 data World = World { player :: !Entity
                    , target :: !Entity
                    } deriving (Show)
@@ -22,8 +23,9 @@ data World = World { player :: !Entity
 data Event = EvSimStart
            | EvGcdEnd EntityId
            | EvCooldownExpire
+           | EvAutoAttackReady
            | EvSwingDamage EntityId EntityId Damage
-           deriving (Show)
+           --deriving (Show)
 
 type AbilityMap = Map String Ability
 

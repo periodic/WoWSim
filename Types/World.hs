@@ -16,6 +16,7 @@ module Types.World (
 
 import Types.Common
 import Types.Entity
+import Types.Event
 
 {-
 data World = World { player :: !Entity

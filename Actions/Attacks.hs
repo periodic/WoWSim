@@ -14,5 +14,12 @@ attack dmg = do
     putW (World player target')
 
 
-autoAttack :: Damage -> Sim World Event ()
-autoAttack = undefined -- TODO: waiting for addHandler
+startAutoAttack :: DTime -> Damage -> Sim World Event ()
+startAutoAttack timer dmg = do
+    addHandler "AutoAttack" autoAttackHandler
+    after 0 EvAutoAttackReady
+    where
+        autoAttackHandler EvAutoAttackReady = do 
+            attack dmg
+            after timer EvAutoAttackReady
+        autoAttackHandler _ = return()
