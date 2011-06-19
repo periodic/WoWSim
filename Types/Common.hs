@@ -12,9 +12,23 @@ import Data.Typeable
 -- For labels
 import Language.Haskell.TH
 import Data.Record.Label
+import System.Random
 import qualified Control.Category as Cat
 
 a <.> b = (Cat..) a b
+
+
+{----------------------------------------
+ - Config type
+ ----------------------------------------}
+
+data SimConfig = SimConfig {
+                           } deriving (Show)
+
+
+{----------------------------------------
+ - General types
+ ----------------------------------------}
 
 data ActionState = ActionState { actionSource :: Entity
                                , actionTarget :: Entity
@@ -26,19 +40,22 @@ type Health = Integer
 type Damage = Integer
 
 newtype EntityId = EntityId String
-                   deriving (Eq)
+                   deriving (Eq, Ord)
 instance Show EntityId where
     show (EntityId name) = name
 
+type EntityMap = Map EntityId Entity
+
 data Entity = Entity { eID        :: !EntityId
+                     , eTarget    :: !EntityId
                      , eHealth    :: !Health
                      , eGlobalCD  :: !Time
                      , eCooldowns :: Map String Time
                      , eStats     :: Stats
                      } deriving (Show)
 
-data World = World { player :: !Entity
-                   , target :: !Entity
+data World = World { wEntities :: EntityMap
+                   , wGen      :: !StdGen
                    } deriving (Show)
 
 data Event = EvSimStart

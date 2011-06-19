@@ -1,0 +1,32 @@
+Name:               WoWSim
+Version:            0.1
+Synopsis:           World of Warcraft Combat Simulator
+Description:        Simulate World of Warcraft combat via a discrete event simulator.
+License:            GPL
+License-file:       LICENSE
+Author:             Drew Haven
+Maintainer:         Drew Haven <drew.haven@gmail.com>
+Build-depends:      base,
+                    template-haskell,
+                    mtl,
+                    fclabels,
+                    random,
+                    containers,
+                    DisEvSim
+Build-type:         Simple
+
+Other-modules:      Actions.Attacks,
+                    Actions.Common,
+                    AI.AutoAttack,
+                    AI.Info,
+                    AI.Warrior,
+                    Types.Common,
+                    Types.Entity,
+                    Types.EntityId,
+                    Types.Event,
+                    Types.Stats,
+                    Types.World
+Executable:         WoWSim
+Main-is:            WoWSim.hs
+ghc-options:        -rtsopts
+                    

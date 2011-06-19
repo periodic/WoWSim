@@ -14,8 +14,8 @@ warrior eid (EvCooldownExpire _ _)  = rotation eid
 warrior eid _                       = return ()
 
 rotation eid = do
-    ingcd <- playerOnGCD
-    oncd  <- playerAbilOnCooldown msName
+    ingcd <- onGCD
+    oncd  <- abilOnCooldown msName
     if (ingcd || oncd)
         then return ()
         else useAbility mortalStrike

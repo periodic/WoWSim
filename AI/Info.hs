@@ -3,14 +3,14 @@ module AI.Info where
 import Types.World
 import Actions.Common
 
-playerOnGCD :: Action Bool
-playerOnGCD =
-    do  (World player _) <- getW
-        t                <- getT
-        return $ onGCD player t
+onGCD :: Action Bool
+onGCD =
+    do  s <- getSource
+        t <- getTime
+        return $ entityOnGCD s t
 
-playerAbilOnCooldown :: String -> Action Bool
-playerAbilOnCooldown name =
-    do  (World player _) <- getW
-        t                <- getT
-        return $ onCooldown player name t
+abilOnCooldown :: String -> Action Bool
+abilOnCooldown name =
+    do  s <- getSource
+        t <- getTime
+        return $ entityOnCooldown s name t

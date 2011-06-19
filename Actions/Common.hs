@@ -4,12 +4,14 @@ import qualified DisEvSim as Sim
 import Types.World
 import Control.Monad.Reader
 
+import Data.Functor ((<$>))
+
 
 getW = lift Sim.getW
 putW = lift . Sim.putW
 modW :: (World -> World) -> Action ()
 modW = lift . Sim.modW
-getT = lift Sim.getT
+getTime = lift Sim.getT
 after t ev = lift $ Sim.after t ev
 addHandler :: String -> (Event -> Action ()) -> Action()
 addHandler name handler = do
@@ -18,25 +20,37 @@ addHandler name handler = do
     lift $ Sim.addHandler name h
 transformHandler handler state = (flip runReaderT $ state) . handler
 
+getSource = actionSource <$> ask
+getTarget = actionTarget <$> ask
+
+insertEntity :: Entity -> Action ()
+insertEntity e = do
+    w <- getW
+    putW $ w { wEntities = updateEntityList e (wEntities w)}
+
 resetGCD :: Action ()
 resetGCD =
-    do  w@(World player _)  <- getW
-        t                   <- getT
-        let player' = player { eGlobalCD = t + 1.5 }
-        putW $ w { player = player' }
-        after 1.5 . EvGcdEnd . eID $ player
+    do  w <- getW
+        t <- getTime
+        src  <- getSource
+        targ <- getTarget
+        let src' = src { eGlobalCD = t + 1.5 }
+        insertEntity src'
+        after 1.5 . EvGcdEnd . eID $ src
 
 setCooldown :: String -> Sim.DTime -> Action ()
 setCooldown name dt =
-    do  w@(World player _) <- getW
-        t                  <- getT
-        let player' = addCooldown player name (t + dt)
-        putW $ w { player = player' }
+    do  w <- getW
+        t <- getTime
+        p <- getSource
+        let p' = entityAddCooldown p name (t + dt)
+        insertEntity p'
 
 useAbility :: Ability -> Action ()
 useAbility abil = do
-    (World player target) <- getW
-    t                     <- getT
+    w <- getW
+    t <- getTime
+    p <- getSource
     if (abilTriggerGCD abil)
         then resetGCD
         else return ()
@@ -44,5 +58,5 @@ useAbility abil = do
         Nothing -> return ()
         Just dt -> do
             setCooldown (abilName abil) dt
-            after dt (EvCooldownExpire (eID player) (abilName abil))
+            after dt (EvCooldownExpire (eID p) (abilName abil))
     abilAction abil

@@ -1,9 +1,11 @@
 module Types.World (
                    -- From Types.Entity
                      getId
-                   , onGCD
-                   , onCooldown
-                   , addCooldown
+                   , addEntityList
+                   , updateEntityList
+                   , entityOnGCD
+                   , entityOnCooldown
+                   , entityAddCooldown
                    , makeEntity
                    -- From Types.Common
                    , Damage

@@ -6,12 +6,18 @@ import Actions.Common
 
 attack :: AbilityId -> Damage -> Action ()
 attack abilName dmg = do
-    (World player target) <- getW
-    t                     <- getT
-    after 0 (EvSwingDamage (eID player) (eID target) abilName dmg)
-    let target' = target { eHealth = eHealth target + dmg }
-    putW (World player target')
+    w <- getW
+    t <- getTime
+    p <- getSource
+    t <- getTarget
+    let t' = t { eHealth = eHealth t + dmg }
+    after 0 (EvSwingDamage (eID p) (eID t) abilName dmg)
+    insertEntity t'
 
+-- |Make an attack with the equipped weapon, with a multiplicative modifier and flat bonus.
+--weapon :: AbilityId -> Float -> Damage -> Action ()
+--weapon abilName mult bonus = do
+    
 
 startAutoAttack :: EntityId -> DTime -> Damage -> Action ()
 startAutoAttack owner timer dmg = do

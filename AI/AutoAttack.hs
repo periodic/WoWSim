@@ -10,7 +10,7 @@ import Actions.Attacks
 autoAttack :: Event -> Action ()
 autoAttack (EvSimStart) = swing
 autoAttack (EvGcdEnd _) =
-    do  ingcd <- playerOnGCD
+    do  ingcd <- onGCD
         if (ingcd)
             then return ()
             else swing
