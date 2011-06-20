@@ -1,6 +1,6 @@
-module Types.World ( 
+module Types.World ( module Types.Common
                    -- From Types.Entity
-                     getId
+                   , getId
                    , addEntityList
                    , updateEntityList
                    , lookupEntityInList
@@ -11,18 +11,6 @@ module Types.World (
                    , makeEntity
                    -- From Types.EntityId
                    , getIdFromString
-                   -- From Types.Common
-                   , Damage
-                   , Health
-                   , World(..)
-                   , Entity(..)
-                   , EntityId(..)
-                   , Event(..)
-                   , Ability(..)
-                   , AbilityId
-                   -- Action monad
-                   , Action
-                   , ActionState(..)
                    -- DisEvSim
                    , DTime
                    , Time

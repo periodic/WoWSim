@@ -2,7 +2,6 @@ module Actions.Common where
 
 import Prelude hiding (lookup)
 import qualified DisEvSim as Sim
-import Types.Common
 import Types.World
 import Control.Monad.Reader
 

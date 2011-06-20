@@ -1,6 +1,5 @@
 module Actions.Attacks where
 
-import Types.Common
 import Types.World
 
 import Actions.Common
