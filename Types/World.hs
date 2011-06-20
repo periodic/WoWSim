@@ -1,4 +1,4 @@
-module Types.World (
+module Types.World ( 
                    -- From Types.Entity
                      getId
                    , addEntityList
@@ -29,6 +29,8 @@ import DisEvSim (DTime, Time, Sim)
 import Types.Common
 import Types.Entity
 import Types.Event
+
+import Control.Monad.State
 
 {-
 data World = World { player :: !Entity

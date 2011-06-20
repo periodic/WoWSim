@@ -7,13 +7,13 @@ import AI.Info
 import Actions.Common
 import Actions.Attacks
 
-warrior :: EntityId -> Event -> Action ()
-warrior eid (EvSimStart)            = startAutoAttack eid 2.0 100 >> rotation eid
-warrior eid (EvGcdEnd _)            = rotation eid
-warrior eid (EvCooldownExpire _ _)  = rotation eid
-warrior eid _                       = return ()
+warrior :: Event -> Action ()
+warrior (EvSimStart)            = startAutoAttack 2.0 100 >> rotation
+warrior (EvGcdEnd _)            = rotation
+warrior (EvCooldownExpire _ _)  = rotation
+warrior _                       = return ()
 
-rotation eid = do
+rotation = do
     ingcd <- onGCD
     oncd  <- abilOnCooldown msName
     if (ingcd || oncd)

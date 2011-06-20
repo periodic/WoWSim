@@ -19,15 +19,17 @@ attack abilName dmg = do
 --weapon abilName mult bonus = do
     
 
-startAutoAttack :: EntityId -> DTime -> Damage -> Action ()
-startAutoAttack owner timer dmg = do
-    addHandler name autoAttackHandler
+startAutoAttack :: DTime -> Damage -> Action ()
+startAutoAttack timer dmg = do
+    src <- getSource
+    let owner = eID src
+    addHandler name (autoAttackHandler owner)
     after 0 (EvAutoAttackReady owner)
     where
         name = "AutoAttack"
-        autoAttackHandler (EvAutoAttackReady eid) 
+        autoAttackHandler owner (EvAutoAttackReady eid) 
             | eid == owner = do 
                 attack name dmg
                 after timer (EvAutoAttackReady owner)
             | otherwise = return ()
-        autoAttackHandler _ = return ()
+        autoAttackHandler _ _ = return ()

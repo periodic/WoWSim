@@ -8,6 +8,8 @@ module Types.Entity ( Entity(..)
                     , updateEntityList
                     ) where
 
+import Prelude hiding (lookup)
+
 import DisEvSim (DTime, Time)
 import Data.Map
 
@@ -31,6 +33,10 @@ addEntityList e map = insert (eID e) e map
 -- |Update an entity, replacing the old entity with the new one.
 updateEntityList :: Entity -> EntityMap -> EntityMap
 updateEntityList e map = insert (eID e) e map
+
+-- |Update an entity, replacing the old entity with the new one.
+lookupEntityFromList :: Entity -> EntityMap -> Maybe Entity
+lookupEntityFromList e map = lookup (eID e) map
 
 -- |Test whether an entity is in GCD
 entityOnGCD :: Entity -> Time -> Bool

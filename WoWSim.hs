@@ -25,7 +25,7 @@ main = do
         world   = World { wEntities = entities 
                         , wGen    = gen
                         }
-        ai      = transformHandler (warrior (eID pEntity)) (ActionState pEntity tEntity)
+        ai      = makeHandler pEntity warrior
         config  = defaultConfig { enableLog = True }
         (t, log, world') = {-# SCC "sim" #-} simulate config world [("Warrior", ai)] EvSimStart (read dur)
     putStrLn . showLog $ log

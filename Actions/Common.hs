@@ -1,27 +1,53 @@
 module Actions.Common where
 
+import Prelude hiding (lookup)
 import qualified DisEvSim as Sim
 import Types.World
 import Control.Monad.Reader
 
 import Data.Functor ((<$>))
+import Data.Map (lookup)
 
 
+-- * Functions on Sim
+-- | This function lets us transform handlers defined on Action and lift them to Sim.
+makeHandler :: Entity -> (Event -> Action ()) -> Event -> Sim World Event ()
+makeHandler e a ev = do
+    mpEntity <- getEntity . eID $ e
+    case mpEntity of
+        Nothing      -> return ()
+        Just pEntity -> do
+            mtEntity <- getEntity . eTarget $ pEntity
+            case mtEntity of 
+                Nothing      -> return ()
+                Just tEntity -> (flip runReaderT) (ActionState pEntity tEntity) $ a ev
+
+-- | Get an entity based on the ID.
+getEntity :: EntityId -> Sim World Event (Maybe Entity)
+getEntity eid = (lookup eid . wEntities) `fmap` Sim.getW
+
+-- * Functions on Action
+-- ** Data manipulation functions
 getW = lift Sim.getW
 putW = lift . Sim.putW
 modW :: (World -> World) -> Action ()
 modW = lift . Sim.modW
 getTime = lift Sim.getT
 after t ev = lift $ Sim.after t ev
+getSource = actionSource <$> ask
+getTarget = actionTarget <$> ask
+
+-- ** Other functions
 addHandler :: String -> (Event -> Action ()) -> Action()
 addHandler name handler = do
     actionState <- ask
-    let h = transformHandler handler actionState
+    h <- transformHandler handler
     lift $ Sim.addHandler name h
-transformHandler handler state = (flip runReaderT $ state) . handler
 
-getSource = actionSource <$> ask
-getTarget = actionTarget <$> ask
+transformHandler :: (Event -> Action ()) -> Action (Event -> Sim World Event ())
+transformHandler h = do 
+    actionState <- ask
+    return $ (flip runReaderT $ actionState) . h
 
 insertEntity :: Entity -> Action ()
 insertEntity e = do
