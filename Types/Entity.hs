@@ -18,13 +18,13 @@ import Types.EntityId
 import Types.Stats
 
 -- |Create a default entity.
-makeEntity name = Entity { eID          = getIdFromString name
-                         , eTarget      = getIdFromString ""
-                         , eHealth      = 0 
-                         , eGlobalCD    = 0 
-                         , eCooldowns   = empty 
-                         , eStats       = defaultStats
-                         }
+makeEntity name targ = Entity { eID          = getIdFromString name
+                              , eTarget      = getIdFromString targ
+                              , eHealth      = 0 
+                              , eGlobalCD    = 0 
+                              , eCooldowns   = empty 
+                              , eStats       = defaultStats
+                              }
 
 -- |Add an entity to the entity map.
 addEntityList :: Entity -> EntityMap -> EntityMap

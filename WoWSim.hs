@@ -19,8 +19,8 @@ import AI.Warrior
 main = do
     [dur]   <- getArgs
     gen     <- newStdGen
-    let pEntity = makeEntity "Player"
-        tEntity = makeEntity "Target"
+    let pEntity = makeEntity "Player" "Target"
+        tEntity = makeEntity "Target" "Player"
         entities = addEntityList pEntity . addEntityList tEntity $ empty
         world   = World { wEntities = entities 
                         , wGen    = gen
