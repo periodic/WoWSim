@@ -121,12 +121,12 @@ spellHitFunc aStats tStats hitDmg critDmg gen =
                    then (ResultCrit critDmg, g)
                    else (ResultHit hitDmg,  g)
 
-weaponDamage :: Stats -> Stats -> StdGen -> (Damage, StdGen)
-weaponDamage aStats tStats gen =
+weaponDamage :: Stats -> Stats -> Float -> Damage -> StdGen -> (Damage, StdGen)
+weaponDamage aStats tStats mult bonus gen =
     let (wdmg, gen') = randomR (minDmg aStats, maxDmg aStats) gen
         dmg          = truncate $ (fromIntegral wdmg) 
                                 * (getL physMult aStats) 
-     in (actualPhysDamage aStats tStats dmg, gen')
+     in ((+ bonus) . truncate . (* mult) . fromIntegral $ actualPhysDamage aStats tStats dmg, gen')
     where
         ap2dps stats = fromIntegral (getL attackPower stats) * (getL weaponSpeed stats) / 14
         --avgDmg stats = (minDmg stats + maxDmg stats) `div` 2
@@ -135,10 +135,10 @@ weaponDamage aStats tStats gen =
         maxDmg stats = (getL weaponMaxDamage stats) 
                         + truncate (ap2dps stats * getL weaponSpeed stats)
 
-weaponAttack :: Stats -> Stats -> StdGen -> (AttackResult, StdGen)
-weaponAttack aStats tStats gen = 
+weaponAttack :: Stats -> Stats -> Float -> Damage -> StdGen -> (AttackResult, StdGen)
+weaponAttack aStats tStats mult bonus gen = 
     let (dmgGen, hitGen)    = System.Random.split gen
-        (dmg, _)            = weaponDamage aStats tStats dmgGen
+        (dmg, _)            = weaponDamage aStats tStats mult bonus dmgGen 
         critDmg             = truncate . (* getL physCritMult aStats) . fromIntegral $ dmg
      in physHitFunc aStats tStats dmg critDmg hitGen
 

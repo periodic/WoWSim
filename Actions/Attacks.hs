@@ -17,7 +17,7 @@ weapon :: AbilityId -> Float -> Damage -> Action ()
 weapon abilName mult bonus = do
     src <- getSource
     trg <- getTarget
-    result <- withRandom $ weaponAttack (getL eStats src) (getL eStats trg)
+    result <- withRandom $ weaponAttack (getL eStats src) (getL eStats trg) mult bonus
     logAttack abilName result
 
 logAttack :: AbilityId -> AttackResult -> Action ()

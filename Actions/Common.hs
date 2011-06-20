@@ -128,6 +128,7 @@ registerCast dt abil= do
     let aid = getL abilName abil
         handlerName = show sid ++ aid
     addHandler handlerName (handler sid)
+    after 0 $ EvCastStarted sid aid
     after dt $ EvCastComplete sid aid
     where
         handler sid (EvCastComplete eid aid) =

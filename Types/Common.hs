@@ -76,6 +76,7 @@ data Event = EvSimStart
            | EvAutoAttackStart EntityId
            | EvAutoAttackStop  EntityId
            | EvAutoAttackReady EntityId
+           | EvCastStarted     EntityId AbilityId
            | EvCastComplete    EntityId AbilityId
            | EvCastInterrupted EntityId AbilityId
            | EvHit   EntityId EntityId AbilityId Damage

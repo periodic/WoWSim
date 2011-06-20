@@ -16,9 +16,11 @@ warrior _                       = return ()
 rotation = do
     ingcd <- onGCD
     oncd  <- abilOnCooldown msName
-    if (ingcd || oncd)
-        then return ()
-        else useAbility mortalStrike
+    if ingcd
+        then return()
+        else if oncd
+            then useAbility slam
+            else useAbility mortalStrike
     where
         msName = "MortalStrike"
         mortalStrike =
@@ -27,5 +29,14 @@ rotation = do
                     , _abilTriggerGCD = True
                     , _abilCastTime   = 0
                     , _abilSchool     = Physical
-                    , _abilAction     = weapon msName 1 100
+                    , _abilAction     = weapon msName 2 100
+                    }
+        slamName = "Slam"
+        slam = 
+            Ability { _abilName       = slamName
+                    , _abilCooldown   = Nothing
+                    , _abilTriggerGCD = True
+                    , _abilCastTime   = 1.5
+                    , _abilSchool     = Physical
+                    , _abilAction     = weapon slamName 1 100
                     }

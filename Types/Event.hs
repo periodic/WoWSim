@@ -16,3 +16,6 @@ instance Show Event where
     show (EvDodge pid tid abil)         = printf "%s dodged %s's %s" (show tid) (show pid) abil
     show (EvParry pid tid abil)         = printf "%s parried %s's %s" (show tid) (show pid) abil
     show (EvMiss pid tid abil)          = printf "%s %s missed %s" (show pid) abil (show tid)
+    show (EvCastStarted  eid aid)       = printf "%s began casting %s" (show eid) aid
+    show (EvCastComplete eid aid)       = printf "%s completed cast of %s" (show eid) aid
+    show (EvCastInterrupted eid aid)    = printf "%s's cast of %s was interrupted" (show eid) aid
