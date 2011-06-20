@@ -14,7 +14,8 @@ module Types.Stats ( Stats (..)
                    , actualSpellDamage
                    , actualSpellDamageCoeff
                    , actualPhysDamage
-                   , spellHasteMultiplier
+                   , actualSpellCastTime
+                   , actualMeleeCastTime
                    , weaponAttack
                    {-
                    , addAttributeBonus
@@ -191,8 +192,17 @@ actualSpellDamageCoeff coeff spCoeff baseCastTime school stats dmg
 
 {- Haste calculations -}
 
-spellHasteMultiplier :: Stats -> Float
-spellHasteMultiplier stats = 1 - getL spellHaste stats
+spellHasteMultiplier :: (Fractional a) => Stats -> a
+spellHasteMultiplier stats = fromRational . toRational $ 1 - getL spellHaste stats
+
+meleeHasteMultiplier :: (Fractional a) => Stats -> a
+meleeHasteMultiplier stats = fromRational . toRational $ 1 - getL meleeHaste stats
+
+actualSpellCastTime :: DTime -> Stats -> DTime
+actualSpellCastTime dt stats = dt * spellHasteMultiplier stats
+
+actualMeleeCastTime :: DTime -> Stats -> DTime
+actualMeleeCastTime dt stats = dt * meleeHasteMultiplier stats
 
 {- Modifier functions -}
 

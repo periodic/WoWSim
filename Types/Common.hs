@@ -9,6 +9,9 @@ import Control.Monad.Reader
 import Data.Data
 import Data.Typeable
 
+-- For shows
+import Text.Printf (printf)
+
 -- For labels
 import Language.Haskell.TH
 import Data.Record.Label
@@ -48,9 +51,19 @@ data Entity = Entity { _eID        :: !EntityId
                      , _eTarget    :: !EntityId
                      , _eHealth    :: !Health
                      , _eGlobalCD  :: !Time
+                     , _eCast      :: Maybe (Ability, Time)
                      , _eCooldowns :: Map String Time
                      , _eStats     :: Stats
-                     } deriving (Show)
+                     }
+instance Show Entity where
+    show (Entity id targ health gcd cast _ _) = 
+        printf "Entity { eId = \"%s\", eTarget = \"%s\", eHealth = %d, eGlobalCD = %d, eCast = %d }" 
+            (show id)
+            (show targ)
+            health 
+            gcd 
+            (show $ snd `fmap` cast)
+
 
 data World = World { _wEntities :: EntityMap
                    , _wGen      :: !StdGen
@@ -63,6 +76,8 @@ data Event = EvSimStart
            | EvAutoAttackStart EntityId
            | EvAutoAttackStop  EntityId
            | EvAutoAttackReady EntityId
+           | EvCastComplete    EntityId AbilityId
+           | EvCastInterrupted EntityId AbilityId
            | EvHit   EntityId EntityId AbilityId Damage
            | EvCrit  EntityId EntityId AbilityId Damage
            | EvDodge EntityId EntityId AbilityId
@@ -72,9 +87,11 @@ data Event = EvSimStart
 
 type AbilityMap = Map AbilityId Ability
 type AbilityId = String
-data Ability = Ability { _abilName       :: String
+data Ability = Ability { _abilName       :: AbilityId
                        , _abilCooldown   :: Maybe DTime
                        , _abilTriggerGCD :: Bool
+                       , _abilCastTime   :: DTime
+                       , _abilSchool     :: SpellSchool
                        , _abilAction     :: Action ()
                        }
 -- * Function types

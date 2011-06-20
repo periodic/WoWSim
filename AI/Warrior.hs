@@ -25,5 +25,7 @@ rotation = do
             Ability { _abilName       = msName
                     , _abilCooldown   = Just 6
                     , _abilTriggerGCD = True
+                    , _abilCastTime   = 0
+                    , _abilSchool     = Physical
                     , _abilAction     = weapon msName 1 100
                     }

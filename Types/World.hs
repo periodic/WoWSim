@@ -11,6 +11,8 @@ module Types.World ( module Types.Common
                    , makeEntity
                    -- From Types.EntityId
                    , getIdFromString
+                   -- From Types.Ability
+                   , realAbilCastTime
                    -- DisEvSim
                    , DTime
                    , Time
@@ -23,6 +25,7 @@ module Types.World ( module Types.Common
                    , (<$>)
                    ) where
 
+import Types.Ability
 import Types.Common
 import Types.Entity
 import Types.EntityId

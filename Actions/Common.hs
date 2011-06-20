@@ -57,6 +57,10 @@ addHandler name handler = do
     h <- transformHandler handler
     lift $ Sim.addHandler name h
 
+removeHandler :: String -> Action ()
+removeHandler name = do
+    lift $ Sim.removeHandler name
+
 transformHandler :: (Event -> Action ()) -> Action (Event -> Sim World Event ())
 transformHandler h = do 
     actionState <- ask
@@ -84,6 +88,12 @@ modifyTarget f = do
     tid <- getL eID <$> getTarget
     modW $ modL wEntities (adjustEntityInList f tid)
 
+-- ** Dealing with abilities
+getAbilCastTime :: Ability -> Action DTime
+getAbilCastTime abil = do
+    stats <- getL eStats <$> getSource
+    return $ realAbilCastTime abil stats
+
 -- ** Manipulate the source entity
 resetGCD :: Action ()
 resetGCD =
@@ -107,4 +117,24 @@ useAbility abil = do
     case (getL abilCooldown abil) of
         Nothing -> return ()
         Just dt -> setCooldown (getL abilName abil) dt
-    getL abilAction abil
+    ct <- getAbilCastTime abil
+    if ct <= 0
+        then getL abilAction abil
+        else registerCast ct abil
+
+registerCast :: DTime -> Ability -> Action ()
+registerCast dt abil= do
+    sid <- getL eID <$> getSource
+    let aid = getL abilName abil
+        handlerName = show sid ++ aid
+    addHandler handlerName (handler sid)
+    after dt $ EvCastComplete sid aid
+    where
+        handler sid (EvCastComplete eid aid) =
+            if (eid == sid) && (getL abilName abil) == aid
+            then do getL abilAction abil
+                    sid <- getL eID <$> getSource
+                    removeHandler (show sid ++ aid)
+            else return ()
+        handler _   _ = return ()
+    

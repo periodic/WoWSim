@@ -15,16 +15,19 @@ import Prelude hiding (lookup)
 import DisEvSim (DTime, Time)
 import Data.Map
 import Data.Record.Label
+import Text.Printf
 
 import Types.Common
 import Types.EntityId
 import Types.Stats
+
 
 -- |Create a default entity.
 makeEntity name targ = Entity { _eID          = getIdFromString name
                               , _eTarget      = getIdFromString targ
                               , _eHealth      = 0 
                               , _eGlobalCD    = 0 
+                              , _eCast        = Nothing
                               , _eCooldowns   = empty 
                               , _eStats       = defaultStats
                               }
@@ -59,3 +62,14 @@ entityOnCooldown name t e =
 -- |Add a cooldown to the entity's cooldown map.
 entityAddCooldown :: String -> Time -> Entity -> Entity
 entityAddCooldown name t e = modL eCooldowns (insert name t) e
+
+-- ** Casting related functions
+-- | Test whether the entity is casting
+entityIsCasting :: Time -> Entity -> Bool
+entityIsCasting t e = case getL eCast e of
+    Just (_, ct)    -> ct > t
+    Nothing         -> False
+
+-- | Start the cast timer
+entityStartCasting :: Time -> Ability -> Entity -> Entity
+entityStartCasting t abil = setL eCast (Just (abil, t)) 
