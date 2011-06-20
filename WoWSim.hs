@@ -3,6 +3,7 @@ module Main where
 import Types.World
 
 import DisEvSim
+import DisEvSim.Debug
 
 import System.Environment
 import System.CPUTime
@@ -34,4 +35,5 @@ main = do
         Just targ -> print $ (t, getL eHealth targ)
         Nothing   -> print $ (t)
 
+showLog :: [(Time, Event)] -> String
 showLog = intercalate "\n" . map (\(t,e) -> show t ++ " - " ++ show e)
