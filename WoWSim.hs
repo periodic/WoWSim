@@ -1,7 +1,7 @@
 module Main where
 
+import Types.Common
 import Types.World
-import Types.EntityId
 
 import DisEvSim
 
@@ -22,13 +22,17 @@ main = do
     let pEntity = makeEntity "Player" "Target"
         tEntity = makeEntity "Target" "Player"
         entities = addEntityList pEntity . addEntityList tEntity $ empty
-        world   = World { wEntities = entities 
-                        , wGen    = gen
+        -- TODO: move this to Types.World
+        world   = World { _wEntities = entities 
+                        , _wGen      = gen
                         }
         ai      = makeHandler pEntity warrior
         config  = defaultConfig { enableLog = True }
         (t, log, world') = {-# SCC "sim" #-} simulate config world [("Warrior", ai)] EvSimStart (read dur)
     putStrLn . showLog $ log
-    print $ (t, Map.lookup (getIdFromString "Target") . wEntities $ world')
+    let tFinal = Map.lookup (getIdFromString "Target") . getL wEntities $ world'
+    case tFinal of
+        Just targ -> print $ (t, getL eHealth targ)
+        Nothing   -> print $ (t)
 
 showLog = intercalate "\n" . map (\(t,e) -> show t ++ " - " ++ show e)

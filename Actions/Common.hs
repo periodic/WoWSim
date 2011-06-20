@@ -2,42 +2,46 @@ module Actions.Common where
 
 import Prelude hiding (lookup)
 import qualified DisEvSim as Sim
+import Types.Common
 import Types.World
 import Control.Monad.Reader
 
 import Data.Functor ((<$>))
 import Data.Map (lookup)
+import Data.Record.Label
 
 
 -- * Functions on Sim
 -- | This function lets us transform handlers defined on Action and lift them to Sim.
 makeHandler :: Entity -> (Event -> Action ()) -> Event -> Sim World Event ()
 makeHandler e a ev = do
-    mpEntity <- getEntity . eID $ e
+    mpEntity <- getEntity . (getL eID) $ e
     case mpEntity of
         Nothing      -> return ()
         Just pEntity -> do
-            mtEntity <- getEntity . eTarget $ pEntity
+            mtEntity <- getEntity . (getL eTarget) $ pEntity
             case mtEntity of 
                 Nothing      -> return ()
                 Just tEntity -> (flip runReaderT) (ActionState pEntity tEntity) $ a ev
 
 -- | Get an entity based on the ID.
 getEntity :: EntityId -> Sim World Event (Maybe Entity)
-getEntity eid = (lookup eid . wEntities) `fmap` Sim.getW
+getEntity eid = (lookup eid . getL wEntities) `fmap` Sim.getW
 
 -- * Functions on Action
--- ** Data manipulation functions
+-- ** Lifters from Sim to Action
+getW :: Action World
 getW = lift Sim.getW
+putW :: World -> Action ()
 putW = lift . Sim.putW
 modW :: (World -> World) -> Action ()
 modW = lift . Sim.modW
+getTime :: Action Time
 getTime = lift Sim.getT
+after :: DTime -> Event -> Action ()
 after t ev = lift $ Sim.after t ev
-getSource = actionSource <$> ask
-getTarget = actionTarget <$> ask
 
--- ** Other functions
+-- ** Affect Handlers
 addHandler :: String -> (Event -> Action ()) -> Action()
 addHandler name handler = do
     actionState <- ask
@@ -49,40 +53,49 @@ transformHandler h = do
     actionState <- ask
     return $ (flip runReaderT $ actionState) . h
 
-insertEntity :: Entity -> Action ()
-insertEntity e = do
-    w <- getW
-    putW $ w { wEntities = updateEntityList e (wEntities w)}
+-- ** Manipulate Entities
 
+insertEntity :: Entity -> Action ()
+insertEntity e = modW $ modL wEntities (updateEntityList e)
+
+modifyEntity :: EntityId -> (Entity -> Entity) -> Action ()
+modifyEntity eid f = modW $ modL wEntities (adjustEntityInList f eid)
+
+getSource :: Action Entity
+getSource = getL actionSource <$> ask
+getTarget :: Action Entity
+getTarget = getL actionTarget <$> ask
+
+modifySource :: (Entity -> Entity) -> Action ()
+modifySource f = do
+    sid <- getL eID <$> getSource
+    modW $ modL wEntities (adjustEntityInList f sid)
+modifyTarget :: (Entity -> Entity) -> Action ()
+modifyTarget f = do
+    tid <- getL eID <$> getTarget
+    modW $ modL wEntities (adjustEntityInList f tid)
+
+-- ** Manipulate the source entity
 resetGCD :: Action ()
 resetGCD =
-    do  w <- getW
-        t <- getTime
+    do  t <- getTime
+        modifySource (setL eGlobalCD (t + 1.5))
         src  <- getSource
-        targ <- getTarget
-        let src' = src { eGlobalCD = t + 1.5 }
-        insertEntity src'
-        after 1.5 . EvGcdEnd . eID $ src
+        after 1.5 . EvGcdEnd . getL eID $ src
 
 setCooldown :: String -> Sim.DTime -> Action ()
 setCooldown name dt =
-    do  w <- getW
-        t <- getTime
-        p <- getSource
-        let p' = entityAddCooldown p name (t + dt)
-        insertEntity p'
+    do  t <- getTime
+        src <- getSource
+        modifySource (entityAddCooldown name (t + dt))
+        after dt (EvCooldownExpire (getL eID src) name)
 
 useAbility :: Ability -> Action ()
 useAbility abil = do
-    w <- getW
-    t <- getTime
-    p <- getSource
-    if (abilTriggerGCD abil)
+    if (getL abilTriggerGCD abil)
         then resetGCD
         else return ()
-    case (abilCooldown abil) of
+    case (getL abilCooldown abil) of
         Nothing -> return ()
-        Just dt -> do
-            setCooldown (abilName abil) dt
-            after dt (EvCooldownExpire (eID p) (abilName abil))
-    abilAction abil
+        Just dt -> setCooldown (getL abilName abil) dt
+    getL abilAction abil

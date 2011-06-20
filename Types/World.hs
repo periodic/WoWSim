@@ -3,10 +3,14 @@ module Types.World (
                      getId
                    , addEntityList
                    , updateEntityList
+                   , lookupEntityInList
+                   , adjustEntityInList
                    , entityOnGCD
                    , entityOnCooldown
                    , entityAddCooldown
                    , makeEntity
+                   -- From Types.EntityId
+                   , getIdFromString
                    -- From Types.Common
                    , Damage
                    , Health
@@ -23,17 +27,16 @@ module Types.World (
                    , DTime
                    , Time
                    , Sim
+                   -- From Data.Record.Label
+                   , getL
+                   , setL
+                   , modL
                    ) where
 
-import DisEvSim (DTime, Time, Sim)
 import Types.Common
 import Types.Entity
+import Types.EntityId
 import Types.Event
 
-import Control.Monad.State
-
-{-
-data World = World { player :: !Entity
-                   , target :: !Entity
-                   } deriving (Show)
--}
+import DisEvSim (DTime, Time, Sim)
+import Data.Record.Label (getL, modL, setL)

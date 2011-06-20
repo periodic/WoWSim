@@ -30,8 +30,8 @@ data SimConfig = SimConfig {
  - General types
  ----------------------------------------}
 
-data ActionState = ActionState { actionSource :: Entity
-                               , actionTarget :: Entity
+data ActionState = ActionState { _actionSource :: Entity
+                               , _actionTarget :: Entity
                                } deriving (Show)
 
 type Action = ReaderT ActionState (Sim World Event)
@@ -46,16 +46,16 @@ instance Show EntityId where
 
 type EntityMap = Map EntityId Entity
 
-data Entity = Entity { eID        :: !EntityId
-                     , eTarget    :: !EntityId
-                     , eHealth    :: !Health
-                     , eGlobalCD  :: !Time
-                     , eCooldowns :: Map String Time
-                     , eStats     :: Stats
+data Entity = Entity { _eID        :: !EntityId
+                     , _eTarget    :: !EntityId
+                     , _eHealth    :: !Health
+                     , _eGlobalCD  :: !Time
+                     , _eCooldowns :: Map String Time
+                     , _eStats     :: Stats
                      } deriving (Show)
 
-data World = World { wEntities :: EntityMap
-                   , wGen      :: !StdGen
+data World = World { _wEntities :: EntityMap
+                   , _wGen      :: !StdGen
                    } deriving (Show)
 
 data Event = EvSimStart
@@ -70,10 +70,10 @@ data Event = EvSimStart
 
 type AbilityMap = Map AbilityId Ability
 type AbilityId = String
-data Ability = Ability { abilName       :: String
-                       , abilCooldown   :: Maybe DTime
-                       , abilTriggerGCD :: Bool
-                       , abilAction     :: Action ()
+data Ability = Ability { _abilName       :: String
+                       , _abilCooldown   :: Maybe DTime
+                       , _abilTriggerGCD :: Bool
+                       , _abilAction     :: Action ()
                        }
 
 {----------------------------------------
@@ -206,4 +206,4 @@ data Stats = Stats { _level              :: Integer
                    , _spellCritMult      :: Float
                    } deriving (Show)
 
-$(mkLabels [''Stats])
+$(mkLabels [''Ability, ''Action, ''ActionState, ''Entity, ''World, ''Stats])

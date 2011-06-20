@@ -1,18 +1,16 @@
 module Actions.Attacks where
 
+import Types.Common
 import Types.World
 
 import Actions.Common
 
 attack :: AbilityId -> Damage -> Action ()
 attack abilName dmg = do
-    w <- getW
-    t <- getTime
-    p <- getSource
-    t <- getTarget
-    let t' = t { eHealth = eHealth t + dmg }
-    after 0 (EvSwingDamage (eID p) (eID t) abilName dmg)
-    insertEntity t'
+    src <- getSource
+    trg <- getTarget
+    modifyTarget $ modL eHealth (+ dmg)
+    after 0 (EvSwingDamage (getL eID src) (getL eID trg) abilName dmg)
 
 -- |Make an attack with the equipped weapon, with a multiplicative modifier and flat bonus.
 --weapon :: AbilityId -> Float -> Damage -> Action ()
@@ -22,7 +20,7 @@ attack abilName dmg = do
 startAutoAttack :: DTime -> Damage -> Action ()
 startAutoAttack timer dmg = do
     src <- getSource
-    let owner = eID src
+    let owner = getL eID src
     addHandler name (autoAttackHandler owner)
     after 0 (EvAutoAttackReady owner)
     where

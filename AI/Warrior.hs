@@ -22,8 +22,8 @@ rotation = do
     where
         msName = "MortalStrike"
         mortalStrike =
-            Ability { abilName       = msName
-                    , abilCooldown   = Just 6
-                    , abilTriggerGCD = True
-                    , abilAction     = attack msName 100
+            Ability { _abilName       = msName
+                    , _abilCooldown   = Just 6
+                    , _abilTriggerGCD = True
+                    , _abilAction     = attack msName 100
                     }
