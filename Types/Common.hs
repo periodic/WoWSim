@@ -16,19 +16,17 @@ import System.Random
 import qualified Control.Category as Cat
 
 a <.> b = (Cat..) a b
+mapFst f (a, b) = (f a, b)
+mapSnd f (a, b) = (a, f b)
 
-
-{----------------------------------------
- - Config type
- ----------------------------------------}
+-- * Config type
 
 data SimConfig = SimConfig {
                            } deriving (Show)
 
 
-{----------------------------------------
- - General types
- ----------------------------------------}
+
+-- * General types
 
 data ActionState = ActionState { _actionSource :: Entity
                                , _actionTarget :: Entity
@@ -65,7 +63,11 @@ data Event = EvSimStart
            | EvAutoAttackStart EntityId
            | EvAutoAttackStop  EntityId
            | EvAutoAttackReady EntityId
-           | EvSwingDamage EntityId EntityId AbilityId Damage
+           | EvHit   EntityId EntityId AbilityId Damage
+           | EvCrit  EntityId EntityId AbilityId Damage
+           | EvDodge EntityId EntityId AbilityId
+           | EvParry EntityId EntityId AbilityId
+           | EvMiss  EntityId EntityId AbilityId
            --deriving (Show)
 
 type AbilityMap = Map AbilityId Ability
@@ -75,10 +77,12 @@ data Ability = Ability { _abilName       :: String
                        , _abilTriggerGCD :: Bool
                        , _abilAction     :: Action ()
                        }
+-- * Function types
 
-{----------------------------------------
- - Various Enumerations
- ----------------------------------------}
+type HitFunc = Stats -> Stats -> Damage -> Damage -> StdGen -> (AttackResult, StdGen)
+
+
+-- * Various Enumerations
 
 data Class     = Warrior
                | Paladin
@@ -123,16 +127,14 @@ data AuraType   = Buff
                 | DebuffOther
                 deriving (Show, Eq, Typeable, Data)
 
-data AttackResult = ResultHit
-                  | ResultCrit
+data AttackResult = ResultHit Damage
+                  | ResultCrit Damage
                   | ResultDodge
                   | ResultParry
                   | ResultMiss
                     deriving (Eq, Show, Typeable, Data)
 
-{----------------------------------------
- - Stats
- ----------------------------------------}
+-- * Stats
 
 data Stats = Stats { _level              :: Integer
                    , _characterClass     :: Class
@@ -159,12 +161,17 @@ data Stats = Stats { _level              :: Integer
                    , _armorPen           :: Integer
                    , _armorIgnored       :: Float
                    -- Weapon stats
+                   {-
                    , _mhWeaponSpeed      :: DTime
                    , _mhWeaponMinDamage  :: Health
                    , _mhWeaponMaxDamage  :: Health
                    , _ohWeaponSpeed      :: DTime
                    , _ohWeaponMinDamage  :: Health
                    , _ohWeaponMaxDamage  :: Health
+                   -}
+                   , _weaponSpeed        :: DTime
+                   , _weaponMinDamage    :: Damage
+                   , _weaponMaxDamage    :: Damage
                    -- Magic stats
                    , _arcaneSpellDamage  :: Integer
                    , _fireSpellDamage    :: Integer
@@ -202,8 +209,10 @@ data Stats = Stats { _level              :: Integer
                    , _healthMax          :: Health
                    -- Other Status
                    , _gcd                :: Float
-                   , _meleeCritMult      :: Float
+                   , _physCritMult       :: Float
+                   , _physMult           :: Float
                    , _spellCritMult      :: Float
+                   , _spellMult          :: Float
                    } deriving (Show)
 
 $(mkLabels [''Ability, ''Action, ''ActionState, ''Entity, ''World, ''Stats])

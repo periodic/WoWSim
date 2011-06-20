@@ -8,6 +8,7 @@ import Control.Monad.Reader
 import Data.Functor ((<$>))
 import Data.Map (lookup)
 import Data.Record.Label
+import System.Random (StdGen)
 
 
 -- * Functions on Sim
@@ -28,6 +29,15 @@ getEntity :: EntityId -> Sim World Event (Maybe Entity)
 getEntity eid = (lookup eid . getL wEntities) `fmap` Sim.getW
 
 -- * Functions on Action
+-- ** General utilities
+
+withRandom :: (StdGen -> (a, StdGen)) -> Action a
+withRandom f  = do
+    gen <- getL wGen <$> getW
+    let (res, gen') = (f gen)
+    modW $ setL wGen gen'
+    return res
+
 -- ** Lifters from Sim to Action
 getW :: Action World
 getW = lift Sim.getW
@@ -40,7 +50,7 @@ getTime = lift Sim.getT
 after :: DTime -> Event -> Action ()
 after t ev = lift $ Sim.after t ev
 
--- ** Affect Handlers
+-- ** Handlers Utilities
 addHandler :: String -> (Event -> Action ()) -> Action()
 addHandler name handler = do
     actionState <- ask

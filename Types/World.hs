@@ -19,6 +19,8 @@ module Types.World ( module Types.Common
                    , getL
                    , setL
                    , modL
+                   -- From Data.Functor
+                   , (<$>)
                    ) where
 
 import Types.Common
@@ -28,3 +30,4 @@ import Types.Event
 
 import DisEvSim (DTime, Time, Sim)
 import Data.Record.Label (getL, modL, setL)
+import Data.Functor

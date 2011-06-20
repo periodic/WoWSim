@@ -8,7 +8,7 @@ import Actions.Common
 import Actions.Attacks
 
 warrior :: Event -> Action ()
-warrior (EvSimStart)            = startAutoAttack 2.0 100 >> rotation
+warrior (EvSimStart)            = startAutoAttack >> rotation
 warrior (EvGcdEnd _)            = rotation
 warrior (EvCooldownExpire _ _)  = rotation
 warrior _                       = return ()
@@ -25,5 +25,5 @@ rotation = do
             Ability { _abilName       = msName
                     , _abilCooldown   = Just 6
                     , _abilTriggerGCD = True
-                    , _abilAction     = attack msName 100
+                    , _abilAction     = weapon msName 1 100
                     }

@@ -15,6 +15,7 @@ module Types.Stats ( Stats (..)
                    , actualSpellDamageCoeff
                    , actualPhysDamage
                    , spellHasteMultiplier
+                   , weaponAttack
                    {-
                    , addAttributeBonus
                    , addAttributeMult
@@ -39,8 +40,6 @@ import Data.Record.Label
 
 import DisEvSim (DTime, Time, Sim)
 import Types.Common
-
-type HitFunc = Stats -> Stats -> StdGen -> (AttackResult, StdGen)
 
 baseSpellMiss alevel tlevel =
     case tlevel - alevel of
@@ -84,7 +83,7 @@ baseDodge c =
         Druid        ->  5.60970 
 
 physHitFunc :: HitFunc
-physHitFunc aStats tStats gen = 
+physHitFunc aStats tStats hitDmg critDmg gen = 
     let (r, gen') = random gen
     in miss r gen'
     where
@@ -102,11 +101,11 @@ physHitFunc aStats tStats gen =
                        else glancing (r - getL parryChance tStats) g
         glancing r g = crit r g
         crit     r g = if r < getL meleeCrit aStats
-                       then (ResultCrit, g)
-                       else (ResultHit , g)
+                       then (ResultCrit critDmg, g)
+                       else (ResultHit hitDmg, g)
 
 spellHitFunc :: HitFunc
-spellHitFunc aStats tStats gen =
+spellHitFunc aStats tStats hitDmg critDmg gen =
     let (r, gen') = random gen
      in miss r gen'
      where 
@@ -118,24 +117,29 @@ spellHitFunc aStats tStats gen =
                    then (ResultMiss, g)
                    else crit (r - missChance) g
         crit r g = if   r < (getL spellCrit aStats)
-                   then (ResultCrit, g)
-                   else (ResultHit,  g)
+                   then (ResultCrit critDmg, g)
+                   else (ResultHit hitDmg,  g)
 
-{-
-weaponDamage :: Stats -> PlayerStats -> StdGen -> (Health, StdGen)
+weaponDamage :: Stats -> Stats -> StdGen -> (Damage, StdGen)
 weaponDamage aStats tStats gen =
-    let (wdmg, gen') = randomR (minDamage aStats, maxDamage aStats) gen
+    let (wdmg, gen') = randomR (minDmg aStats, maxDmg aStats) gen
         dmg          = truncate $ (fromIntegral wdmg) 
-                                * (weaponMult aStats) 
-                                + (fromIntegral . weaponBonus $ aStats)
+                                * (getL physMult aStats) 
      in (actualPhysDamage aStats tStats dmg, gen')
-ap2dps    stats = fromIntegral (attackPower stats) * (weaponSpeed stats) / 14
-avgDamage stats = ((minDamage stats) + (maxDamage stats)) `div` 2
-minDamage stats = (weaponMinDamage stats) 
-                + truncate (ap2dps stats * weaponSpeed stats)
-maxDamage stats = (weaponMaxDamage stats) 
-                + truncate (ap2dps stats * weaponSpeed stats)
--}
+    where
+        ap2dps stats = fromIntegral (getL attackPower stats) * (getL weaponSpeed stats) / 14
+        --avgDmg stats = (minDmg stats + maxDmg stats) `div` 2
+        minDmg stats = (getL weaponMinDamage stats) 
+                        + truncate (ap2dps stats * getL weaponSpeed stats)
+        maxDmg stats = (getL weaponMaxDamage stats) 
+                        + truncate (ap2dps stats * getL weaponSpeed stats)
+
+weaponAttack :: Stats -> Stats -> StdGen -> (AttackResult, StdGen)
+weaponAttack aStats tStats gen = 
+    let (dmgGen, hitGen)    = System.Random.split gen
+        (dmg, _)            = weaponDamage aStats tStats dmgGen
+        critDmg             = truncate . (* getL physCritMult aStats) . fromIntegral $ dmg
+     in physHitFunc aStats tStats dmg critDmg hitGen
 
 actualPhysDamage :: Stats -> Stats -> Health -> Health
 actualPhysDamage aStats tStats dmg = truncate $ (1 - reduction) * (fromIntegral dmg)
@@ -322,12 +326,9 @@ defaultStats = Stats { _level              = 80
                      , _armorPen           = 0
                      , _armorIgnored       = 0
                      -- Weapon stats
-                     , _mhWeaponSpeed      = 0
-                     , _mhWeaponMinDamage  = 0
-                     , _mhWeaponMaxDamage  = 0
-                     , _ohWeaponSpeed      = 0
-                     , _ohWeaponMinDamage  = 0
-                     , _ohWeaponMaxDamage  = 0
+                     , _weaponSpeed         = 2.0
+                     , _weaponMinDamage     = 100
+                     , _weaponMaxDamage     = 200 
                      -- Magic stats
                      , _arcaneSpellDamage  = 0
                      , _fireSpellDamage    = 0
@@ -364,9 +365,11 @@ defaultStats = Stats { _level              = 80
                      -- Health
                      , _healthMax          = 0
                      -- Other Status
-                     , _gcd                = 1.5
-                     , _meleeCritMult      = 2.0
-                     , _spellCritMult      = 1.5
+                     , _gcd                 = 1.5
+                     , _physCritMult        = 2.0
+                     , _physMult            = 1.0
+                     , _spellCritMult       = 1.5
+                     , _spellMult           = 1.0
                      {-
                      , _spellBook          = emptySpellBook
                      -- Stat modifiers
