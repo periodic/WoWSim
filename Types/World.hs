@@ -13,6 +13,10 @@ module Types.World ( module Types.Common
                    , getIdFromString
                    -- From Types.Ability
                    , realAbilCastTime
+                   -- From Types.Aura
+                   , addAuraToMap
+                   , removeAuraFromMap
+                   , isAuraInMap
                    -- DisEvSim
                    , DTime
                    , Time
@@ -30,6 +34,7 @@ import Types.Common
 import Types.Entity
 import Types.EntityId
 import Types.Event
+import Types.Aura
 
 import DisEvSim (DTime, Time, Sim)
 import Data.Record.Label (getL, modL, setL)

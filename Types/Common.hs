@@ -95,9 +95,44 @@ data Ability = Ability { _abilName       :: AbilityId
                        , _abilSchool     :: SpellSchool
                        , _abilAction     :: Action ()
                        }
+
+-- * Auras
+-- | Auras come in two flavors, those that buff, and those that don't.  The
+-- buffs have a type, which is a category of stats they can affect, a buff
+-- function that is used to re-evaluate the stats, and an Id.  Other Auras just
+-- have an ID to identify themselves and are just there to check whether a buff
+-- exists.
+
+data BuffCategory = PrimaryBuff
+                  | SecondaryBuff
+                  | TertiarayBuff
+                  deriving (Show, Eq)
+
+data AuraType   = BeneficialAura
+                | DebuffMagic
+                | DebuffCurse
+                | DebuffPoison
+                | DebuffDisease
+                | DebuffBleed
+                | DebuffOther
+                deriving (Show, Eq, Typeable, Data)
+
+type AuraId = String
+type AuraMap = Map AuraId Aura
+type BuffMap = Map AuraId Buff
+
+data Aura = Aura { _auraId     :: AuraId
+                 , _auraSchool :: SpellSchool
+                 , _auraType   :: AuraType
+                 , _buffCategory    :: BuffCategory
+                 , _buffFunc        :: Buff
+                 }
+
+
 -- * Function types
 
 type HitFunc = Stats -> Stats -> Damage -> Damage -> StdGen -> (AttackResult, StdGen)
+type Buff    = Stats -> Stats
 
 
 -- * Various Enumerations
@@ -135,15 +170,6 @@ data SpellSchool = Arcane
                  | Shadow
                  | Physical
                    deriving (Show, Eq, Typeable, Data)
-
-data AuraType   = Buff 
-                | DebuffMagic
-                | DebuffCurse
-                | DebuffPoison
-                | DebuffDisease
-                | DebuffBleed
-                | DebuffOther
-                deriving (Show, Eq, Typeable, Data)
 
 data AttackResult = ResultHit Damage
                   | ResultCrit Damage
@@ -233,4 +259,4 @@ data Stats = Stats { _level              :: Integer
                    , _spellMult          :: Float
                    } deriving (Show)
 
-$(mkLabels [''Ability, ''Action, ''ActionState, ''Entity, ''World, ''Stats])
+$(mkLabels [''Ability, ''Action, ''ActionState, ''Entity, ''World, ''Stats, ''Aura])
