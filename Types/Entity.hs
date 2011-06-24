@@ -20,17 +20,22 @@ import Text.Printf
 import Types.Common
 import Types.EntityId
 import Types.Stats
+import Types.Handler
+import Types.Aura
 
 
 -- |Create a default entity.
-makeEntity name targ = Entity { _eID          = getIdFromString name
-                              , _eTarget      = getIdFromString targ
-                              , _eHealth      = 0 
-                              , _eGlobalCD    = 0 
-                              , _eCast        = Nothing
-                              , _eCooldowns   = empty 
-                              , _eStats       = defaultStats
-                              }
+makeEntity name targ ai = Entity { _eID          = getIdFromString name
+                                 , _eTarget      = getIdFromString targ
+                                 , _eHealth      = 0 
+                                 , _eGlobalCD    = 0 
+                                 , _eCast        = Nothing
+                                 , _eCooldowns   = empty 
+                                 , _eStats       = defaultStats
+                                 , _eHandlers    = emptyHandlerList
+                                 , _eAI          = ai
+                                 , _eAuras       = emptyAuraMap
+                                 }
 
 -- |Add an entity to the entity map.
 addEntityList :: Entity -> EntityMap -> EntityMap

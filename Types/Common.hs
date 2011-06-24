@@ -31,6 +31,10 @@ data SimConfig = SimConfig {
 
 -- * General types
 
+type HandlerId = String
+type HandlerAction = Event -> Action ()
+type HandlerList = Map String HandlerAction
+
 data ActionState = ActionState { _actionSource :: Entity
                                , _actionTarget :: Entity
                                } deriving (Show)
@@ -47,16 +51,19 @@ instance Show EntityId where
 
 type EntityMap = Map EntityId Entity
 
-data Entity = Entity { _eID        :: !EntityId
-                     , _eTarget    :: !EntityId
-                     , _eHealth    :: !Health
-                     , _eGlobalCD  :: !Time
-                     , _eCast      :: Maybe (Ability, Time)
-                     , _eCooldowns :: Map String Time
-                     , _eStats     :: Stats
+data Entity = Entity { _eID         :: !EntityId
+                     , _eTarget     :: !EntityId
+                     , _eHealth     :: !Health
+                     , _eGlobalCD   :: !Time
+                     , _eCast       :: Maybe (Ability, Time)
+                     , _eCooldowns  :: Map String Time
+                     , _eStats      :: Stats
+                     , _eHandlers   :: HandlerList
+                     , _eAI         :: HandlerAction
+                     , _eAuras      :: AuraMap
                      }
 instance Show Entity where
-    show (Entity id targ health gcd cast _ _) = 
+    show (Entity id targ health gcd cast _ _ _ _ _) = 
         printf "Entity { eId = \"%s\", eTarget = \"%s\", eHealth = %d, eGlobalCD = %d, eCast = %d }" 
             (show id)
             (show targ)

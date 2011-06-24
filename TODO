@@ -1,4 +1,3 @@
-- functions on aura map
 - Alter main handler to go through all entities and gather the results of their AI and aura handlers
 - Each entity has their own handler list
 - add-buff function, plain auras and buffs also going into the buff maps.
