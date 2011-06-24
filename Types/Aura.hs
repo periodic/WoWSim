@@ -18,5 +18,3 @@ isAuraInMap = member
 
 emptyAuraMap = empty
 
-instance Show Aura where
-    show (Aura id school typ cat f) = printf "Aura { id = %s, school = %s, type = %s, category = %s}" (show id) (show school) (show typ) (show cat)

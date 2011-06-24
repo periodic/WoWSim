@@ -9,8 +9,6 @@ module Types.World ( module Types.Common
                    , entityOnCooldown
                    , entityAddCooldown
                    , makeEntity
-                   -- From Types.EntityId
-                   , getIdFromString
                    -- From Types.Ability
                    , realAbilCastTime
                    -- From Types.Aura

@@ -13,9 +13,9 @@ import System.Random (StdGen)
 
 -- * Functions on Sim
 -- | This function lets us transform handlers defined on Action and lift them to Sim.
-makeHandler :: Entity -> (Event -> Action ()) -> Event -> Sim World Event ()
-makeHandler e a ev = do
-    mpEntity <- getEntity . (getL eID) $ e
+makeHandler :: EntityId -> (Event -> Action ()) -> Event -> Sim World Event ()
+makeHandler eid a ev = do
+    mpEntity <- getEntity eid
     case mpEntity of
         Nothing      -> return ()
         Just pEntity -> do
@@ -51,15 +51,15 @@ after :: DTime -> Event -> Action ()
 after t ev = lift $ Sim.after t ev
 
 -- ** Handlers Utilities
-addHandler :: String -> (Event -> Action ()) -> Action()
+addHandler :: (Show a) => a -> (Event -> Action ()) -> Action()
 addHandler name handler = do
     actionState <- ask
     h <- transformHandler handler
-    lift $ Sim.addHandler name h
+    lift $ Sim.addHandler (show name) h
 
-removeHandler :: String -> Action ()
+removeHandler :: (Show a) => a -> Action ()
 removeHandler name = do
-    lift $ Sim.removeHandler name
+    lift $ Sim.removeHandler (show name)
 
 transformHandler :: (Event -> Action ()) -> Action (Event -> Sim World Event ())
 transformHandler h = do 
@@ -105,7 +105,7 @@ resetGCD =
         src  <- getSource
         after 1.5 . EvGcdEnd . getL eID $ src
 
-setCooldown :: String -> Sim.DTime -> Action ()
+setCooldown :: AbilityId -> Sim.DTime -> Action ()
 setCooldown name dt =
     do  t <- getTime
         src <- getSource
@@ -129,7 +129,7 @@ registerCast :: DTime -> Ability -> Action ()
 registerCast dt abil= do
     sid <- getL eID <$> getSource
     let aid = getL abilName abil
-        handlerName = show sid ++ aid
+        handlerName = show sid ++ show aid
     addHandler handlerName (handler sid)
     after 0 $ EvCastStarted sid aid
     after dt $ EvCastComplete sid aid
@@ -138,7 +138,7 @@ registerCast dt abil= do
             if (eid == sid) && (getL abilName abil) == aid
             then do getL abilAction abil
                     sid <- getL eID <$> getSource
-                    removeHandler (show sid ++ aid)
+                    removeHandler (show sid ++ show aid)
             else return ()
         handler _   _ = return ()
     

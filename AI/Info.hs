@@ -9,7 +9,7 @@ onGCD = do
     t <- getTime
     return $ entityOnGCD t s
 
-abilOnCooldown :: String -> Action Bool
+abilOnCooldown :: AbilityId -> Action Bool
 abilOnCooldown name = do
     s <- getSource
     t <- getTime

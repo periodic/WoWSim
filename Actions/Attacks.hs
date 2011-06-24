@@ -39,7 +39,7 @@ startAutoAttack = do
     addHandler name (autoAttackHandler owner)
     after 0 (EvAutoAttackReady owner)
     where
-        name = "AutoAttack"
+        name = AbilityId "AutoAttack"
         autoAttackHandler owner (EvAutoAttackReady eid) 
             | eid == owner = do 
                 delay <- getL (weaponSpeed <.> eStats) <$> getSource

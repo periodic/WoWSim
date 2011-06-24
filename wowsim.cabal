@@ -29,4 +29,3 @@ Other-modules:      Actions.Attacks,
 Executable:         WoWSim
 Main-is:            WoWSim.hs
 ghc-options:        -rtsopts
-                    

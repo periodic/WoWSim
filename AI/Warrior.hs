@@ -22,7 +22,7 @@ rotation = do
             then useAbility slam
             else useAbility mortalStrike
     where
-        msName = "MortalStrike"
+        msName = AbilityId "MortalStrike"
         mortalStrike =
             Ability { _abilName       = msName
                     , _abilCooldown   = Just 6
@@ -31,7 +31,7 @@ rotation = do
                     , _abilSchool     = Physical
                     , _abilAction     = weapon msName 2 100
                     }
-        slamName = "Slam"
+        slamName = AbilityId "Slam"
         slam = 
             Ability { _abilName       = slamName
                     , _abilCooldown   = Nothing

@@ -31,24 +31,30 @@ data SimConfig = SimConfig {
 
 -- * General types
 
-type HandlerId = String
-type HandlerAction = Event -> Action ()
-type HandlerList = Map String HandlerAction
+type Health = Integer
+type Damage = Integer
 
+-- ** IDs
+newtype EntityId = EntityId String deriving (Eq, Ord)
+instance Show EntityId where
+    show (EntityId name) = "Entity." ++ name
+
+newtype AbilityId = AbilityId String deriving (Eq, Ord)
+instance Show AbilityId where
+    show (AbilityId name) = "Ability." ++ name
+
+newtype AuraId = AuraId String deriving (Eq, Ord)
+instance Show AuraId where
+    show (AuraId name) = "Aura." ++ name
+
+-- ** Monads
 data ActionState = ActionState { _actionSource :: Entity
                                , _actionTarget :: Entity
                                } deriving (Show)
 
 type Action = ReaderT ActionState (Sim World Event)
 
-type Health = Integer
-type Damage = Integer
-
-newtype EntityId = EntityId String
-                   deriving (Eq, Ord)
-instance Show EntityId where
-    show (EntityId name) = name
-
+-- ** Entity
 type EntityMap = Map EntityId Entity
 
 data Entity = Entity { _eID         :: !EntityId
@@ -56,14 +62,12 @@ data Entity = Entity { _eID         :: !EntityId
                      , _eHealth     :: !Health
                      , _eGlobalCD   :: !Time
                      , _eCast       :: Maybe (Ability, Time)
-                     , _eCooldowns  :: Map String Time
+                     , _eCooldowns  :: Map AbilityId Time
                      , _eStats      :: Stats
-                     , _eHandlers   :: HandlerList
-                     , _eAI         :: HandlerAction
                      , _eAuras      :: AuraMap
                      }
 instance Show Entity where
-    show (Entity id targ health gcd cast _ _ _ _ _) = 
+    show (Entity id targ health gcd cast _ _ _) = 
         printf "Entity { eId = \"%s\", eTarget = \"%s\", eHealth = %d, eGlobalCD = %d, eCast = %d }" 
             (show id)
             (show targ)
@@ -94,7 +98,6 @@ data Event = EvSimStart
            --deriving (Show)
 
 type AbilityMap = Map AbilityId Ability
-type AbilityId = String
 data Ability = Ability { _abilName       :: AbilityId
                        , _abilCooldown   :: Maybe DTime
                        , _abilTriggerGCD :: Bool
@@ -102,6 +105,8 @@ data Ability = Ability { _abilName       :: AbilityId
                        , _abilSchool     :: SpellSchool
                        , _abilAction     :: Action ()
                        }
+instance Show Ability where
+    show (Ability name _ _ _ _ _) = "Ability." ++  (show name)
 
 -- * Auras
 -- | Auras come in two flavors, those that buff, and those that don't.  The
@@ -124,16 +129,18 @@ data AuraType   = BeneficialAura
                 | DebuffOther
                 deriving (Show, Eq, Typeable, Data)
 
-type AuraId = String
 type AuraMap = Map AuraId Aura
 type BuffMap = Map AuraId Buff
 
-data Aura = Aura { _auraId     :: AuraId
-                 , _auraSchool :: SpellSchool
-                 , _auraType   :: AuraType
+data Aura = Aura { _auraId          :: AuraId
+                 , _auraOwner       :: EntityId
+                 , _auraSchool      :: SpellSchool
+                 , _auraType        :: AuraType
                  , _buffCategory    :: BuffCategory
                  , _buffFunc        :: Buff
                  }
+instance Show Aura where
+    show (Aura name owner _ _ _ _) = printf "Aura.%s.%s" (show owner) (show name)
 
 
 -- * Function types
