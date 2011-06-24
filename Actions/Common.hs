@@ -66,6 +66,9 @@ transformHandler h = do
     actionState <- ask
     return $ (flip runReaderT $ actionState) . h
 
+nullHandler :: Event -> Action()
+nullHandler = const . return $ ()
+
 -- ** Manipulate Entities
 
 insertEntity :: Entity -> Action ()
