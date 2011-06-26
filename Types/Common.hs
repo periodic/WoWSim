@@ -54,6 +54,7 @@ data ActionState = ActionState { _actionSource :: Entity
 
 type Action = ReaderT ActionState (Sim World Event)
 
+type Handler = Event -> Action ()
 -- ** Entity
 type EntityMap = Map EntityId Entity
 
@@ -65,9 +66,11 @@ data Entity = Entity { _eID         :: !EntityId
                      , _eCooldowns  :: Map AbilityId Time
                      , _eStats      :: Stats
                      , _eAuras      :: AuraMap
+                     , _eAI         :: Handler
                      }
+
 instance Show Entity where
-    show (Entity id targ health gcd cast _ _ _) = 
+    show (Entity id targ health gcd cast _ _ _ _) = 
         printf "Entity { eId = \"%s\", eTarget = \"%s\", eHealth = %d, eGlobalCD = %d, eCast = %d }" 
             (show id)
             (show targ)

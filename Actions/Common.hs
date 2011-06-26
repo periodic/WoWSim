@@ -6,7 +6,7 @@ import Types.World
 import Control.Monad.Reader
 
 import Data.Functor ((<$>))
-import Data.Map (lookup)
+import Data.Map (lookup, fold)
 import Data.Record.Label
 import System.Random (StdGen)
 
@@ -23,6 +23,16 @@ makeHandler eid a ev = do
             case mtEntity of 
                 Nothing      -> return ()
                 Just tEntity -> (flip runReaderT) (ActionState pEntity tEntity) $ a ev
+
+-- | This loops over all the entities and evaluates any actions they might need evaluated.
+execActions :: Event -> Sim World Event ()
+execActions ev = do
+    entities <- getL wEntities <$> Sim.getW
+    let combined = Data.Map.fold (\e h -> joinHandlers h $ makeHandler (getL eID e) (getL eAI e)) (const $ return ()) entities
+    combined ev
+    where
+        joinHandlers a b ev = a ev >> b ev
+    
 
 -- | Get an entity based on the ID.
 getEntity :: EntityId -> Sim World Event (Maybe Entity)

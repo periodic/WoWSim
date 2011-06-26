@@ -25,15 +25,16 @@ import Types.Aura
 
 
 -- |Create a default entity.
-makeEntity name targ = Entity { _eID          = EntityId name
-                              , _eTarget      = EntityId targ
-                              , _eHealth      = 0
-                              , _eGlobalCD    = 0
-                              , _eCast        = Nothing
-                              , _eCooldowns   = empty
-                              , _eStats       = defaultStats
-                              , _eAuras       = emptyAuraMap
-                              }
+makeEntity name targ ai = Entity { _eID          = EntityId name
+                                 , _eTarget      = EntityId targ
+                                 , _eHealth      = 0
+                                 , _eGlobalCD    = 0
+                                 , _eCast        = Nothing
+                                 , _eCooldowns   = empty
+                                 , _eStats       = defaultStats
+                                 , _eAuras       = emptyAuraMap
+                                 , _eAI          = ai
+                                 }
 
 -- |Add an entity to the entity map.
 addEntityList :: Entity -> EntityMap -> EntityMap

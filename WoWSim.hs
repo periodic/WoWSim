@@ -19,8 +19,8 @@ import AI.Warrior
 main = do
     [dur]   <- getArgs
     gen     <- newStdGen
-    let pEntity = makeEntity "Player" "Target"
-        tEntity = makeEntity "Target" "Player"
+    let pEntity = makeEntity "Player" "Target" warrior
+        tEntity = makeEntity "Target" "Player" nullHandler
         pID     = getL eID pEntity
         entities = addEntityList pEntity . addEntityList tEntity $ empty
         -- TODO: move this to Types.World
@@ -28,7 +28,7 @@ main = do
                         , _wGen      = gen
                         }
         config  = defaultConfig { enableLog = True }
-        (t, log, world') = {-# SCC "sim" #-} simulate config world [(show pID, makeHandler pID warrior)] EvSimStart (read dur)
+        (t, log, world') = {-# SCC "sim" #-} simulate config world [("Core Handler", execActions)] EvSimStart (read dur)
     putStrLn . showLog $ log
     let tFinal = Map.lookup (EntityId "Target") . getL wEntities $ world'
     case tFinal of
