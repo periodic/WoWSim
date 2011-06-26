@@ -22,5 +22,5 @@
 
 mv $1 $1.bak
 
-awk 'BEGIN { first = 0; cmd = "cabal build && dist/build/WoWSim/WoWSim 6000 +RTS -sstderr 2>&1 1>/dev/null"; sep = "\n====================" } /^#/ { if (first++ == 0) print sep; system(cmd) } // END { if (first == 0) print sep; system(cmd) }' $1.bak > $1
+awk 'BEGIN { first = 0; cmd = "cabal build && dist/build/WoWSim/WoWSim 6000 +RTS -sstderr 2>&1 1>/dev/null"; sep = "\n====================" } /^#/ { if (first++ == 0) { print sep; system(cmd); } } // END { if (first++ == 0) { print sep; system(cmd); } }' $1.bak > $1
 
