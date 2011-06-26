@@ -28,11 +28,11 @@ makeHandler eid a ev = do
 execActions :: Event -> Sim World Event ()
 execActions ev = do
     entities <- getL wEntities <$> Sim.getW
-    let combined = Data.Map.fold (\e h -> joinHandlers h $ makeHandler (getL eID e) (getL eAI e)) (const $ return ()) entities
+    let combined = Data.Map.fold (\e h -> joinHandlers h $ entityActions e) (const $ return ()) entities
     combined ev
     where
+        entityActions e = makeHandler (getL eID e) . joinHandlers (getL eAI e) . Data.Map.fold (joinHandlers) (const $ return ()) . getL eHandlers $ e
         joinHandlers a b ev = a ev >> b ev
-    
 
 -- | Get an entity based on the ID.
 getEntity :: EntityId -> Sim World Event (Maybe Entity)
@@ -63,13 +63,13 @@ after t ev = lift $ Sim.after t ev
 -- ** Handlers Utilities
 addHandler :: (Show a) => a -> (Event -> Action ()) -> Action()
 addHandler name handler = do
-    actionState <- ask
-    h <- transformHandler handler
-    lift $ Sim.addHandler (show name) h
+    src <- getSource
+    modifyEntity (getL eID src) . modL eHandlers $ addHandlerToList (show name) handler
 
 removeHandler :: (Show a) => a -> Action ()
 removeHandler name = do
-    lift $ Sim.removeHandler (show name)
+    src <- getSource
+    modifyEntity (getL eID src) . modL eHandlers $ removeHandlerFromList (show name)
 
 transformHandler :: (Event -> Action ()) -> Action (Event -> Sim World Event ())
 transformHandler h = do 

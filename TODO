@@ -1,9 +1,8 @@
-- Alter main handler to go through all entities and gather the results of their AI and aura handlers
-- Each entity has their own handler list
+* Alter main handler to go through all entities and gather the results of their AI and aura handlers
+* Each entity has their own handler list
+
 - add-buff function, plain auras and buffs also going into the buff maps.
 - Add two base handlers:
   - When a buff-expire event occurs, remove the appropriate buff.
   - When a stats-changed event occurs, recalculate stats.
 - Use temporary stats for all calculations, perhaps in the action setup.
--
-foo

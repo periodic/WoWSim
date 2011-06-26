@@ -2,7 +2,7 @@
 module Types.Common  where
 
 import DisEvSim (Time, DTime, Sim)
-import Data.Map (Map(..))
+import Data.Map (Map(..), keys, elems)
 import Control.Monad.Reader
 
 -- For Data/Typable
@@ -55,6 +55,8 @@ data ActionState = ActionState { _actionSource :: Entity
 type Action = ReaderT ActionState (Sim World Event)
 
 type Handler = Event -> Action ()
+type HandlerId = String
+type HandlerList = Map HandlerId Handler
 -- ** Entity
 type EntityMap = Map EntityId Entity
 
@@ -67,16 +69,22 @@ data Entity = Entity { _eID         :: !EntityId
                      , _eStats      :: Stats
                      , _eAuras      :: AuraMap
                      , _eAI         :: Handler
+                     , _eHandlers   :: HandlerList
                      }
 
 instance Show Entity where
-    show (Entity id targ health gcd cast _ _ _ _) = 
-        printf "Entity { eId = \"%s\", eTarget = \"%s\", eHealth = %d, eGlobalCD = %d, eCast = %d }" 
+    show (Entity id targ health gcd cast cds stats auras ai hs) =
+        printf "Entity { eId = \"%s\", eTarget = \"%s\", eHealth = %d, eGlobalCD = %f, eCast = %d, eCooldowns = %s, eStats = %s, eAuras = %s, eHandlers = %s }"
             (show id)
             (show targ)
-            health 
-            gcd 
+            health
+            gcd
             (show $ snd `fmap` cast)
+            (show cds)
+            (show stats)
+            (show . elems $ auras)
+            (show . keys $ hs)
+
 
 
 data World = World { _wEntities :: EntityMap

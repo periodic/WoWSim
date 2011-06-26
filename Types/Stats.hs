@@ -57,18 +57,18 @@ baseSpellMiss alevel tlevel =
 
 basePhysMiss alevel tlevel = 0.08 -- TODO: get a real table.
 
-dodgeRate c = 
+dodgeRate c =
     case c of
-        Warrior     -> 84.74576271 
+        Warrior     -> 84.74576271
         Paladin     -> 59.88023952
-        DeathKnight -> 84.74576271 
-        Hunter      -> 86.20689655 
-        Shaman      -> 59.88023952 
-        Druid       -> 47.84688995 
-        Rogue       -> 47.84688995 
-        Mage        -> 58.82352941 
-        Priest      -> 59.88023952 
-        Warlock     -> 59.88023952 
+        DeathKnight -> 84.74576271
+        Hunter      -> 86.20689655
+        Shaman      -> 59.88023952
+        Druid       -> 47.84688995
+        Rogue       -> 47.84688995
+        Mage        -> 58.82352941
+        Priest      -> 59.88023952
+        Warlock     -> 59.88023952
 
 baseDodge c =
     case c of
@@ -81,10 +81,10 @@ baseDodge c =
         Shaman       ->  2.10800
         Mage         ->  3.65870
         Warlock      ->  2.42110
-        Druid        ->  5.60970 
+        Druid        ->  5.60970
 
 physHitFunc :: HitFunc
-physHitFunc aStats tStats hitDmg critDmg gen = 
+physHitFunc aStats tStats hitDmg critDmg gen =
     let (r, gen') = random gen
     in miss r gen'
     where
@@ -109,11 +109,11 @@ spellHitFunc :: HitFunc
 spellHitFunc aStats tStats hitDmg critDmg gen =
     let (r, gen') = random gen
      in miss r gen'
-     where 
+     where
         missChance = max 0
-                         (baseSpellMiss (getL level aStats) 
-                                        (getL level tStats) 
-                         - getL spellHit aStats) 
+                         (baseSpellMiss (getL level aStats)
+                                        (getL level tStats)
+                         - getL spellHit aStats)
         miss r g = if   r < missChance
                    then (ResultMiss, g)
                    else crit (r - missChance) g
@@ -124,21 +124,21 @@ spellHitFunc aStats tStats hitDmg critDmg gen =
 weaponDamage :: Stats -> Stats -> Float -> Damage -> StdGen -> (Damage, StdGen)
 weaponDamage aStats tStats mult bonus gen =
     let (wdmg, gen') = randomR (minDmg aStats, maxDmg aStats) gen
-        dmg          = truncate $ (fromIntegral wdmg) 
-                                * (getL physMult aStats) 
+        dmg          = truncate $ (fromIntegral wdmg)
+                                * (getL physMult aStats)
      in ((+ bonus) . truncate . (* mult) . fromIntegral $ actualPhysDamage aStats tStats dmg, gen')
     where
         ap2dps stats = fromIntegral (getL attackPower stats) * (getL weaponSpeed stats) / 14
         --avgDmg stats = (minDmg stats + maxDmg stats) `div` 2
-        minDmg stats = (getL weaponMinDamage stats) 
+        minDmg stats = (getL weaponMinDamage stats)
                         + truncate (ap2dps stats * getL weaponSpeed stats)
-        maxDmg stats = (getL weaponMaxDamage stats) 
+        maxDmg stats = (getL weaponMaxDamage stats)
                         + truncate (ap2dps stats * getL weaponSpeed stats)
 
 weaponAttack :: Stats -> Stats -> Float -> Damage -> StdGen -> (AttackResult, StdGen)
-weaponAttack aStats tStats mult bonus gen = 
+weaponAttack aStats tStats mult bonus gen =
     let (dmgGen, hitGen)    = System.Random.split gen
-        (dmg, _)            = weaponDamage aStats tStats mult bonus dmgGen 
+        (dmg, _)            = weaponDamage aStats tStats mult bonus dmgGen
         critDmg             = truncate . (* getL physCritMult aStats) . fromIntegral $ dmg
      in physHitFunc aStats tStats dmg critDmg hitGen
 
@@ -180,11 +180,11 @@ getSpellMult school =
 {- Returns the actual spell damage given the base damage, casting time, spell
  - school, and the player stats. -}
 actualSpellDamage :: DTime -> SpellSchool -> Stats -> Health -> Health
-actualSpellDamage baseCastTime school stats dmg 
+actualSpellDamage baseCastTime school stats dmg
     = actualSpellDamageCoeff 1.0 1.0 baseCastTime school stats dmg
 
 actualSpellDamageCoeff :: Float -> Float -> DTime -> SpellSchool -> Stats -> Health -> Health
-actualSpellDamageCoeff coeff spCoeff baseCastTime school stats dmg 
+actualSpellDamageCoeff coeff spCoeff baseCastTime school stats dmg
     = let ctmod = realToFrac $ max (baseCastTime / 3.5) (0.4286)
           mult  = getSpellMult school stats * getL spellDamageMult stats
           sp    = truncate . (* ctmod) . (* coeff) . (* spCoeff) . fromIntegral . getSpellPower school $ stats
@@ -206,7 +206,7 @@ actualMeleeCastTime dt stats = dt * meleeHasteMultiplier stats
 
 {- Modifier functions -}
 
-{- Default attribute bonuses are bonsues and multipliers to the base attributes. These are counted first. 
+{- Default attribute bonuses are bonsues and multipliers to the base attributes. These are counted first.
  - Examples:
  - 10% bonus to all stats
  - +200 stamina
@@ -223,7 +223,7 @@ addAttributeMult :: StatMod -> Stats -> Stats
 addAttributeMult mod = modL attributeMult (. mod)
 -}
 
-{- Primary stats are generally rating. 
+{- Primary stats are generally rating.
  - Examples:
  - +200 crit rating
  - Strength -> Parry Rating
@@ -239,7 +239,7 @@ defaultPrimaryMult stats = stats
 addPrimaryMult :: StatMod -> Stats -> Stats
 addPrimaryMult mod = modL primaryStatMult (. mod)
 
-{- Secondary mods are all the actual combat stats. 
+{- Secondary mods are all the actual combat stats.
  - Examples:
  - Crit Rating -> Crit %
  - Stamina -> Health
@@ -257,7 +257,7 @@ defaultSecondaryAdditive stats =
                                 Mage        -> (getL strength stats)
                                 Warlock     -> (getL strength stats)
                                 Priest      -> (getL strength stats)
-                      )) . 
+                      )) .
     (foldr (\sp f -> f . modL sp (+ getL intellect stats)) id [ arcaneSpellDamage
                                                               , fireSpellDamage
                                                               , frostSpellDamage
@@ -276,7 +276,7 @@ defaultSecondaryAdditive stats =
     (modL powerMax   (+ if (getL powerType stats == Mana)
                             then 15 * (getL intellect stats - 20) + 20
                             else 0)
-                     ) . 
+                     ) .
     (modL healthMax  (+ (10 * (getL stamina stats - 20) + 20)))
     $ stats
 addSecondaryBonus :: StatMod -> Stats -> Stats
@@ -288,7 +288,7 @@ addSecondaryMult :: StatMod -> Stats -> Stats
 addSecondaryMult mod = modL secondaryStatMult (. mod)
 
 addSpellPowerBonus :: Integer -> StatMod
-addSpellPowerBonus i = 
+addSpellPowerBonus i =
     let m = modL arcaneSpellDamage (+ i)
           . modL fireSpellDamage   (+ i)
           . modL frostSpellDamage  (+ i)
@@ -299,7 +299,7 @@ addSpellPowerBonus i =
 
 addSpellPowerMult :: Float -> StatMod
 addSpellPowerMult mult =
-    let f = truncate . (* mult) . fromIntegral 
+    let f = truncate . (* mult) . fromIntegral
         m = modL arcaneSpellDamage f
           . modL fireSpellDamage   f
           . modL frostSpellDamage  f
@@ -338,7 +338,7 @@ defaultStats = Stats { _level              = 80
                      -- Weapon stats
                      , _weaponSpeed         = 2.0
                      , _weaponMinDamage     = 100
-                     , _weaponMaxDamage     = 200 
+                     , _weaponMaxDamage     = 100
                      -- Magic stats
                      , _arcaneSpellDamage  = 0
                      , _fireSpellDamage    = 0
@@ -393,7 +393,7 @@ defaultStats = Stats { _level              = 80
                      , _preHitProc         = return ()
                      , _postHitProc        = return ()
                      -}
-                     } 
+                     }
 
 {- Accumulate all the stat mod functions in the right order.  The
  - function-composition opperator needs to be flipped so that they functions
@@ -401,7 +401,7 @@ defaultStats = Stats { _level              = 80
  - they are applied. -}
 {-
 statModifiers :: Stats -> StatMod
-statModifiers stats = 
+statModifiers stats =
     foldr (flip (.)) id . map (\f -> getL f stats) $ [ attributeBonus
                                                      , attributeMult
                                                      , primaryStatBonus

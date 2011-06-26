@@ -15,7 +15,6 @@ import Prelude hiding (lookup)
 import DisEvSim (DTime, Time)
 import Data.Map
 import Data.Record.Label
-import Text.Printf
 
 import Types.Common
 import Types.EntityId
@@ -34,6 +33,7 @@ makeEntity name targ ai = Entity { _eID          = EntityId name
                                  , _eStats       = defaultStats
                                  , _eAuras       = emptyAuraMap
                                  , _eAI          = ai
+                                 , _eHandlers    = emptyHandlerList
                                  }
 
 -- |Add an entity to the entity map.

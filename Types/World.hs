@@ -15,6 +15,9 @@ module Types.World ( module Types.Common
                    , addAuraToMap
                    , removeAuraFromMap
                    , isAuraInMap
+                   -- From Types.Handler
+                   , addHandlerToList
+                   , removeHandlerFromList
                    -- DisEvSim
                    , DTime
                    , Time
@@ -28,11 +31,12 @@ module Types.World ( module Types.Common
                    ) where
 
 import Types.Ability
+import Types.Aura
 import Types.Common
 import Types.Entity
 import Types.EntityId
 import Types.Event
-import Types.Aura
+import Types.Handler
 
 import DisEvSim (DTime, Time, Sim)
 import Data.Record.Label (getL, modL, setL)
