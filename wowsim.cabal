@@ -6,7 +6,7 @@ License:            GPL
 License-file:       LICENSE
 Author:             Drew Haven
 Maintainer:         Drew Haven <drew.haven@gmail.com>
-Build-depends:      base,
+Build-depends:      base >= 4,
                     template-haskell,
                     mtl,
                     fclabels,
@@ -28,4 +28,4 @@ Other-modules:      Actions.Attacks,
                     Types.World
 Executable:         WoWSim
 Main-is:            WoWSim.hs
-ghc-options:        -rtsopts
+--ghc-options:        -rtsopts
