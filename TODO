@@ -6,3 +6,4 @@
   - When a stats-changed event occurs, recalculate stats.
 - Use temporary stats for all calculations, perhaps in the action setup.
 -
+foo
