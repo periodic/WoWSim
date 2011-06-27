@@ -36,7 +36,12 @@ makeEntity name targ ai = Entity { _eID          = EntityId name
                                  , _eAuras       = emptyAuraMap
                                  , _eAI          = ai
                                  , _eHandlers    = emptyHandlerList
-                                 , _eBuffs       = emptyBuffList
+                                 , _eAttFlatBuffs   = addBuffToList "default" defaultAttributeAdditive emptyBuffList
+                                 , _eAttMultBuffs   = addBuffToList "default" defaultAttributeMult     emptyBuffList
+                                 , _ePriFlatBuffs   = addBuffToList "default" defaultPrimaryAdditive   emptyBuffList
+                                 , _ePriMultBuffs   = addBuffToList "default" defaultPrimaryMult       emptyBuffList
+                                 , _eSecFlatBuffs   = addBuffToList "default" defaultSecondaryAdditive emptyBuffList
+                                 , _eSecMultBuffs   = addBuffToList "default" defaultSecondaryMult     emptyBuffList
                                  }
 
 -- |Add an entity to the entity map.

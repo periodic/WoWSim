@@ -6,7 +6,7 @@ import Types.World
 import Control.Monad.Reader
 
 import Data.Functor ((<$>))
-import Data.Map (lookup, insert, fold)
+import Data.Map (lookup, insert, fold, keys)
 import Data.Record.Label
 import System.Random (StdGen)
 
@@ -28,21 +28,29 @@ makeHandler eid a ev = do
 execActions :: Event -> Sim World Event ()
 execActions ev = do
     entities <- getL wEntities <$> Sim.getW
-    let combined = Data.Map.fold (\e h -> joinHandlers h $ entityActions e) (updateStats) entities
-    updateStats ev
+    let combined = Data.Map.fold (\e h -> joinHandlers h $ entityActions e) (updateStatsHandler) entities
     combined ev
     where
         entityActions e = makeHandler (getL eID e) . joinHandlers (getL eAI e) . Data.Map.fold (joinHandlers) (const $ return ()) . getL eHandlers $ e
         joinHandlers a b ev = a ev >> b ev
 
 -- | Handle updating from buffs.
-updateStats :: Event -> Sim World Event ()
-updateStats (EvBuffsChanged eid) = do
+updateStatsHandler :: Event -> Sim World Event ()
+updateStatsHandler (EvBuffsChanged eid) = updateStats eid
+updateStatsHandler (EvSimStart) = do
+    w <- Sim.getW
+    foldr ((>>) . updateStats) (return ()) . keys . getL wEntities $ w
+updateStatsHandler _                    = return ()
+
+-- | Actual update-stats worker.  Does the real work.
+updateStats :: EntityId -> Sim World Event ()
+updateStats eid = do
     mE <- getEntity eid
     case mE of
-        Just e  -> putEntity . modL eStats (applyBuffList (getL eBuffs e)) $ e
+        Just e  -> putEntity . setL eStats (buff e . getL eBaseStats $ e) $ e
         Nothing -> return ()
-updateStats _ = return ()
+    where
+        buff e = foldr (.) id . map (\l -> applyBuffList . getL l $ e) $ [eSecMultBuffs, eSecFlatBuffs, ePriMultBuffs, ePriFlatBuffs, eAttMultBuffs, eAttFlatBuffs]
 
 -- | Get an entity based on the ID.
 getEntity :: EntityId -> Sim World Event (Maybe Entity)

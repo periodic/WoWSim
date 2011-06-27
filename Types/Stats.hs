@@ -17,6 +17,12 @@ module Types.Stats ( Stats (..)
                    , actualSpellCastTime
                    , actualMeleeCastTime
                    , weaponAttack
+                   , defaultAttributeAdditive
+                   , defaultAttributeMult
+                   , defaultPrimaryAdditive
+                   , defaultPrimaryMult
+                   , defaultSecondaryAdditive
+                   , defaultSecondaryMult
                    {-
                    , addAttributeBonus
                    , addAttributeMult
@@ -211,14 +217,15 @@ actualMeleeCastTime dt stats = dt * meleeHasteMultiplier stats
  - 10% bonus to all stats
  - +200 stamina
  - -}
-{-
 defaultAttributeAdditive :: StatMod
-defaultAttributeAdditive stats = stats
-addAttributeBonus :: StatMod -> Stats -> Stats
-addAttributeBonus mod = modL attributeBonus (. mod)
+defaultAttributeAdditive = id
 
 defaultAttributeMult :: StatMod
-defaultAttributeMult stats = stats
+defaultAttributeMult = id
+
+{-
+addAttributeBonus :: StatMod -> Stats -> Stats
+addAttributeBonus mod = modL attributeBonus (. mod)
 addAttributeMult :: StatMod -> Stats -> Stats
 addAttributeMult mod = modL attributeMult (. mod)
 -}
@@ -228,14 +235,15 @@ addAttributeMult mod = modL attributeMult (. mod)
  - +200 crit rating
  - Strength -> Parry Rating
  - -}
-{-
 defaultPrimaryAdditive :: StatMod
-defaultPrimaryAdditive stats = stats
-addPrimaryBonus :: StatMod -> Stats -> Stats
-addPrimaryBonus mod = modL primaryStatBonus (. mod)
+defaultPrimaryAdditive = id
 
 defaultPrimaryMult :: StatMod
-defaultPrimaryMult stats = stats
+defaultPrimaryMult = id
+
+{-
+addPrimaryBonus :: StatMod -> Stats -> Stats
+addPrimaryBonus mod = modL primaryStatBonus (. mod)
 addPrimaryMult :: StatMod -> Stats -> Stats
 addPrimaryMult mod = modL primaryStatMult (. mod)
 -}
@@ -281,12 +289,12 @@ defaultSecondaryAdditive stats =
     (modL healthMax  (+ (10 * (getL stamina stats - 20) + 20)))
     $ stats
 
+defaultSecondaryMult :: StatMod
+defaultSecondaryMult = id
 {-
 addSecondaryBonus :: StatMod -> Stats -> Stats
 addSecondaryBonus mod = modL secondaryStatBonus (. mod)
 
-defaultSecondaryMult :: StatMod
-defaultSecondaryMult stats = stats
 addSecondaryMult :: StatMod -> Stats -> Stats
 addSecondaryMult mod = modL secondaryStatMult (. mod)
 
@@ -317,11 +325,11 @@ addSpellPowerMult mult =
 defaultStats = Stats { _level              = 80
                      , _characterClass     = Warrior
                      -- Ability Scores
-                     , _strength           = 0
-                     , _agility            = 0
-                     , _stamina            = 0
-                     , _intellect          = 0
-                     , _spirit             = 0
+                     , _strength           = 100
+                     , _agility            = 100
+                     , _stamina            = 100
+                     , _intellect          = 100
+                     , _spirit             = 100
                      -- ratings
                      , _critRating         = 0
                      , _spellCrit          = 0

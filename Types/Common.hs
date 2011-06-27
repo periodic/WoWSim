@@ -27,8 +27,6 @@ mapSnd f (a, b) = (a, f b)
 data SimConfig = SimConfig {
                            } deriving (Show)
 
-
-
 -- * General types
 
 type Health = Integer
@@ -80,11 +78,16 @@ data Entity = Entity { _eID         :: !EntityId
                      , _eAuras      :: AuraMap
                      , _eAI         :: Handler
                      , _eHandlers   :: HandlerList
-                     , _eBuffs      :: BuffList
+                     , _eAttFlatBuffs   :: BuffList
+                     , _eAttMultBuffs   :: BuffList
+                     , _ePriFlatBuffs   :: BuffList
+                     , _ePriMultBuffs   :: BuffList
+                     , _eSecFlatBuffs   :: BuffList
+                     , _eSecMultBuffs   :: BuffList
                      }
 
 instance Show Entity where
-    show (Entity id targ health gcd cast cds stats bStats auras ai hs buffs) =
+    show (Entity id targ health gcd cast cds stats bStats auras ai hs buffs _ _ _ _ _) =
         printf "Entity { eId = \"%s\", eTarget = \"%s\", eHealth = %d, eGlobalCD = %f, eCast = %d, eCooldowns = %s, eStats = %s, eAuras = %s, eHandlers = %s, eBuffs = %s }"
             (show id)
             (show targ)
