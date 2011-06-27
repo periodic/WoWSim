@@ -238,6 +238,7 @@ defaultPrimaryMult :: StatMod
 defaultPrimaryMult stats = stats
 addPrimaryMult :: StatMod -> Stats -> Stats
 addPrimaryMult mod = modL primaryStatMult (. mod)
+-}
 
 {- Secondary mods are all the actual combat stats.
  - Examples:
@@ -279,6 +280,8 @@ defaultSecondaryAdditive stats =
                      ) .
     (modL healthMax  (+ (10 * (getL stamina stats - 20) + 20)))
     $ stats
+
+{-
 addSecondaryBonus :: StatMod -> Stats -> Stats
 addSecondaryBonus mod = modL secondaryStatBonus (. mod)
 

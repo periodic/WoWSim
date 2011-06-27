@@ -6,7 +6,7 @@ import Types.World
 import Control.Monad.Reader
 
 import Data.Functor ((<$>))
-import Data.Map (lookup, fold)
+import Data.Map (lookup, insert, fold)
 import Data.Record.Label
 import System.Random (StdGen)
 
@@ -28,15 +28,28 @@ makeHandler eid a ev = do
 execActions :: Event -> Sim World Event ()
 execActions ev = do
     entities <- getL wEntities <$> Sim.getW
-    let combined = Data.Map.fold (\e h -> joinHandlers h $ entityActions e) (const $ return ()) entities
+    let combined = Data.Map.fold (\e h -> joinHandlers h $ entityActions e) (updateStats) entities
+    updateStats ev
     combined ev
     where
         entityActions e = makeHandler (getL eID e) . joinHandlers (getL eAI e) . Data.Map.fold (joinHandlers) (const $ return ()) . getL eHandlers $ e
         joinHandlers a b ev = a ev >> b ev
 
+-- | Handle updating from buffs.
+updateStats :: Event -> Sim World Event ()
+updateStats (EvBuffsChanged eid) = do
+    mE <- getEntity eid
+    case mE of
+        Just e  -> putEntity . modL eStats (applyBuffList (getL eBuffs e)) $ e
+        Nothing -> return ()
+updateStats _ = return ()
+
 -- | Get an entity based on the ID.
 getEntity :: EntityId -> Sim World Event (Maybe Entity)
 getEntity eid = (lookup eid . getL wEntities) `fmap` Sim.getW
+
+putEntity :: Entity -> Sim World Event ()
+putEntity e = Sim.modW $ modL wEntities (insert (getL eID e) e)
 
 -- * Functions on Action
 -- ** General utilities

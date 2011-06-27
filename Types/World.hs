@@ -15,6 +15,10 @@ module Types.World ( module Types.Common
                    , addAuraToMap
                    , removeAuraFromMap
                    , isAuraInMap
+                   -- From Types.Buff
+                   , applyBuffList
+                   , addBuffToList
+                   , removeBuffFromList
                    -- From Types.Handler
                    , addHandlerToList
                    , removeHandlerFromList
@@ -32,6 +36,7 @@ module Types.World ( module Types.Common
 
 import Types.Ability
 import Types.Aura
+import Types.Buff
 import Types.Common
 import Types.Entity
 import Types.EntityId

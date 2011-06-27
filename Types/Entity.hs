@@ -16,11 +16,12 @@ import DisEvSim (DTime, Time)
 import Data.Map
 import Data.Record.Label
 
+import Types.Aura
+import Types.Buff
 import Types.Common
 import Types.EntityId
 import Types.Stats
 import Types.Handler
-import Types.Aura
 
 
 -- |Create a default entity.
@@ -31,9 +32,11 @@ makeEntity name targ ai = Entity { _eID          = EntityId name
                                  , _eCast        = Nothing
                                  , _eCooldowns   = empty
                                  , _eStats       = defaultStats
+                                 , _eBaseStats   = defaultStats
                                  , _eAuras       = emptyAuraMap
                                  , _eAI          = ai
                                  , _eHandlers    = emptyHandlerList
+                                 , _eBuffs       = emptyBuffList
                                  }
 
 -- |Add an entity to the entity map.

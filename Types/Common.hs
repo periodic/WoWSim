@@ -54,9 +54,18 @@ data ActionState = ActionState { _actionSource :: Entity
 
 type Action = ReaderT ActionState (Sim World Event)
 
+-- ** Handlers
+
 type Handler = Event -> Action ()
 type HandlerId = String
 type HandlerList = Map HandlerId Handler
+
+-- ** Buffs
+
+type Buff     = Stats -> Stats
+type BuffId   = String
+type BuffList = Map BuffId Buff
+
 -- ** Entity
 type EntityMap = Map EntityId Entity
 
@@ -67,14 +76,16 @@ data Entity = Entity { _eID         :: !EntityId
                      , _eCast       :: Maybe (Ability, Time)
                      , _eCooldowns  :: Map AbilityId Time
                      , _eStats      :: Stats
+                     , _eBaseStats  :: Stats
                      , _eAuras      :: AuraMap
                      , _eAI         :: Handler
                      , _eHandlers   :: HandlerList
+                     , _eBuffs      :: BuffList
                      }
 
 instance Show Entity where
-    show (Entity id targ health gcd cast cds stats auras ai hs) =
-        printf "Entity { eId = \"%s\", eTarget = \"%s\", eHealth = %d, eGlobalCD = %f, eCast = %d, eCooldowns = %s, eStats = %s, eAuras = %s, eHandlers = %s }"
+    show (Entity id targ health gcd cast cds stats bStats auras ai hs buffs) =
+        printf "Entity { eId = \"%s\", eTarget = \"%s\", eHealth = %d, eGlobalCD = %f, eCast = %d, eCooldowns = %s, eStats = %s, eAuras = %s, eHandlers = %s, eBuffs = %s }"
             (show id)
             (show targ)
             health
@@ -84,6 +95,7 @@ instance Show Entity where
             (show stats)
             (show . elems $ auras)
             (show . keys $ hs)
+            (show . keys $ buffs)
 
 
 
@@ -106,6 +118,7 @@ data Event = EvSimStart
            | EvDodge EntityId EntityId AbilityId
            | EvParry EntityId EntityId AbilityId
            | EvMiss  EntityId EntityId AbilityId
+           | EvBuffsChanged     EntityId
            --deriving (Show)
 
 type AbilityMap = Map AbilityId Ability
@@ -157,8 +170,6 @@ instance Show Aura where
 -- * Function types
 
 type HitFunc = Stats -> Stats -> Damage -> Damage -> StdGen -> (AttackResult, StdGen)
-type Buff    = Stats -> Stats
-
 
 -- * Various Enumerations
 
@@ -204,6 +215,8 @@ data AttackResult = ResultHit Damage
                     deriving (Eq, Show, Typeable, Data)
 
 -- * Stats
+
+type StatMod = Stats -> Stats
 
 data Stats = Stats { _level              :: Integer
                    , _characterClass     :: Class
