@@ -75,7 +75,7 @@ data Entity = Entity { _eID         :: !EntityId
                      , _eCooldowns  :: Map AbilityId Time
                      , _eStats      :: Stats
                      , _eBaseStats  :: Stats
-                     , _eAuras      :: AuraMap
+                     , _eAuras      :: AuraList
                      , _eAI         :: Handler
                      , _eHandlers   :: HandlerList
                      , _eAttFlatBuffs   :: BuffList
@@ -122,6 +122,8 @@ data Event = EvSimStart
            | EvParry EntityId EntityId AbilityId
            | EvMiss  EntityId EntityId AbilityId
            | EvBuffsChanged     EntityId
+           | EvAuraApplied   EntityId EntityId AuraId
+           | EvAuraExpire    EntityId EntityId AuraId
            --deriving (Show)
 
 type AbilityMap = Map AbilityId Ability
@@ -142,11 +144,6 @@ instance Show Ability where
 -- have an ID to identify themselves and are just there to check whether a buff
 -- exists.
 
-data BuffCategory = PrimaryBuff
-                  | SecondaryBuff
-                  | TertiarayBuff
-                  deriving (Show, Eq)
-
 data AuraType   = BeneficialAura
                 | DebuffMagic
                 | DebuffCurse
@@ -156,18 +153,18 @@ data AuraType   = BeneficialAura
                 | DebuffOther
                 deriving (Show, Eq, Typeable, Data)
 
-type AuraMap = Map AuraId Aura
-type BuffMap = Map AuraId Buff
-
+type AuraList = Map AuraId Aura
 data Aura = Aura { _auraId          :: AuraId
                  , _auraOwner       :: EntityId
                  , _auraSchool      :: SpellSchool
                  , _auraType        :: AuraType
-                 , _buffCategory    :: BuffCategory
-                 , _buffFunc        :: Buff
-                 }
+                 , _auraDuration    :: DTime
+                 } deriving (Show)
+
+{-
 instance Show Aura where
-    show (Aura name owner _ _ _ _) = printf "Aura.%s.%s" (show owner) (show name)
+    show (Aura name owner school type duration _ _) = printf "Aura.%s.%s" (show owner) (show name)
+    -}
 
 
 -- * Function types

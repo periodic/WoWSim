@@ -1,8 +1,7 @@
 * Alter main handler to go through all entities and gather the results of their AI and aura handlers
 * Each entity has their own handler list
+* Use temporary stats for all calculations, perhaps in the action setup.
+* add-buff function, 
 
-- Use temporary stats for all calculations, perhaps in the action setup.
-- add-buff function, plain auras and buffs also going into the buff maps.
-- Add two base handlers:
-  - When a buff-expire event occurs, remove the appropriate buff.
-  - When a stats-changed event occurs, recalculate stats.
+- Aura durations.  Automatically remove auras after their duration expires.
+- Auras need their owners dynamically set.  Need to have the information available in their handlers.

@@ -1,6 +1,5 @@
 module AI.Warrior where
 
-import DisEvSim
 import Types.World
 import AI.Info
 
@@ -40,3 +39,25 @@ rotation = do
                     , _abilSchool     = Physical
                     , _abilAction     = weapon slamName 1 100
                     }
+        rendName = AbilityId "Rend"
+        rend = 
+            Ability { _abilName       = rendName
+                    , _abilCooldown   = Nothing
+                    , _abilTriggerGCD = True
+                    , _abilCastTime   = 0
+                    , _abilSchool     = Physical
+                    , _abilAction     = do
+                        addTargetAura rendAura
+                        addHandler "Rend" rendHandler
+                    }
+        rendHandler :: Event -> Action ()
+        rendHandler (EvAuraExpire _ _ (AuraId "Rend")) = removeHandler "Rend"
+        -- Rend needs to:
+        --   Remove it's handler on expiry?
+        --   Be able to trigger events at intervals that other handlers don't need to see.
+        rendAura = Aura { _auraId          = AuraId "Rend"
+                        , _auraOwner       = EntityId "SET ME!"
+                        , _auraSchool      = Physical
+                        , _auraType        = DebuffBleed
+                        , _auraDuration    = 15
+                        }

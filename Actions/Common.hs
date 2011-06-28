@@ -172,4 +172,19 @@ registerCast dt abil= do
                     removeHandler (show sid ++ show aid)
             else return ()
         handler _   _ = return ()
-    
+
+addBuff :: ((:->) Entity BuffList) -> BuffId -> Buff -> Action ()
+addBuff cat bid buff = modifySource $ modL cat (addBuffToList bid buff)
+
+addSourceAura :: Aura -> Action ()
+addSourceAura a = do
+    modifySource . modL eAuras . addAuraToList $ a
+    sid <- getL eID <$> getSource
+    after 0 (EvAuraApplied sid sid (getL auraId a))
+
+addTargetAura :: Aura -> Action ()
+addTargetAura a = do
+    modifyTarget . modL eAuras . addAuraToList $ a
+    sid <- getL eID <$> getSource
+    tid <- getL eID <$> getTarget
+    after 0 (EvAuraApplied sid tid (getL auraId a))

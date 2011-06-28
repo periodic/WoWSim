@@ -19,3 +19,5 @@ instance Show Event where
     show (EvDodge pid tid abil)         = printf "%s dodged %s's %s" (show tid) (show pid) (show abil)
     show (EvParry pid tid abil)         = printf "%s parried %s's %s" (show tid) (show pid) (show abil)
     show (EvMiss pid tid abil)          = printf "%s %s missed %s" (show pid) (show abil) (show tid)
+    show (EvAuraApplied sid tid aura)   = printf "%s gained %s's %s" (show tid) (show sid) (show aura)
+    show (EvAuraExpire  sid tid aura)   = printf "%s lost %s's %s" (show tid) (show sid) (show aura)

@@ -12,9 +12,9 @@ module Types.World ( module Types.Common
                    -- From Types.Ability
                    , realAbilCastTime
                    -- From Types.Aura
-                   , addAuraToMap
-                   , removeAuraFromMap
-                   , isAuraInMap
+                   , addAuraToList
+                   , removeAuraFromList
+                   , isAuraInList
                    -- From Types.Buff
                    , applyBuffList
                    , addBuffToList

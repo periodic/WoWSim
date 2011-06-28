@@ -7,14 +7,14 @@ import Data.Record.Label
 
 import Text.Printf
 
-addAuraToMap :: Aura -> AuraMap -> AuraMap
-addAuraToMap aura = insert (getL auraId aura) aura
+addAuraToList :: Aura -> AuraList -> AuraList
+addAuraToList aura = insert (getL auraId aura) aura
 
-removeAuraFromMap :: AuraId -> AuraMap -> AuraMap
-removeAuraFromMap = delete
+removeAuraFromList :: AuraId -> AuraList -> AuraList
+removeAuraFromList = delete
 
-isAuraInMap :: AuraId -> AuraMap -> Bool
-isAuraInMap = member
+isAuraInList :: AuraId -> AuraList -> Bool
+isAuraInList = member
 
-emptyAuraMap = empty
+emptyAuraList = empty
 

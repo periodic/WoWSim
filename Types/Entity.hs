@@ -33,7 +33,7 @@ makeEntity name targ ai = Entity { _eID          = EntityId name
                                  , _eCooldowns   = empty
                                  , _eStats       = defaultStats
                                  , _eBaseStats   = defaultStats
-                                 , _eAuras       = emptyAuraMap
+                                 , _eAuras       = emptyAuraList
                                  , _eAI          = ai
                                  , _eHandlers    = emptyHandlerList
                                  , _eAttFlatBuffs   = addBuffToList "default" defaultAttributeAdditive emptyBuffList
