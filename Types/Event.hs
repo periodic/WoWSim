@@ -6,6 +6,8 @@ import Text.Printf
 
 instance Show Event where
     show EvSimStart                     = "Sim Start"
+    show (EvMessage msg)                = msg
+    show (EvAction _)                   = ""
     show (EvGcdEnd eid)                 = printf "GCD end for %s" (show eid)
     show (EvCooldownExpire eid name)    = printf "Cooldown Expired for %s's %s" (show eid) (show name)
     show (EvAutoAttackStart eid)        = printf "Autoattack started for %s" (show eid)

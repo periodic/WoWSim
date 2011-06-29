@@ -18,14 +18,11 @@ makeHandler eid a ev = do
     mpEntity <- getEntity eid
     case mpEntity of
         Nothing      -> return ()
-        Just pEntity -> do
-            mtEntity <- getEntity . (getL eTarget) $ pEntity
-            case mtEntity of 
-                Nothing      -> return ()
-                Just tEntity -> (flip runReaderT) (ActionState pEntity tEntity) $ a ev
+        Just pEntity -> (flip runReaderT) (ActionState eid (getL eTarget pEntity)) $ a ev
 
 -- | This loops over all the entities and evaluates any actions they might need evaluated.
 execActions :: Event -> Sim World Event ()
+execActions (EvAction act) = act
 execActions ev = do
     entities <- getL wEntities <$> Sim.getW
     let combined = Data.Map.fold (\e h -> joinHandlers h $ entityActions e) (updateStatsHandler) entities
@@ -109,9 +106,19 @@ modifyEntity :: EntityId -> (Entity -> Entity) -> Action ()
 modifyEntity eid f = modW $ modL wEntities (adjustEntityInList f eid)
 
 getSource :: Action Entity
-getSource = getL actionSource <$> ask
+getSource = do
+    eid <- getL actionSource <$> ask
+    mE  <- lift $ getEntity eid
+    case mE of
+        Just e  -> return e
+        Nothing -> fail "Could not find source entity."
 getTarget :: Action Entity
-getTarget = getL actionTarget <$> ask
+getTarget = do
+    eid <- getL actionTarget <$> ask
+    mE  <- lift $ getEntity eid
+    case mE of
+        Just e  -> return e
+        Nothing -> fail "Could not find source entity."
 
 modifySource :: (Entity -> Entity) -> Action ()
 modifySource f = do
@@ -159,27 +166,32 @@ useAbility abil = do
 registerCast :: DTime -> Ability -> Action ()
 registerCast dt abil= do
     sid <- getL eID <$> getSource
+    t   <- getTime
     let aid = getL abilName abil
         handlerName = show sid ++ show aid
+    modifySource . setL eCast . Just $ (abil, t + dt)
     addHandler handlerName (handler sid)
-    after 0 $ EvCastStarted sid aid
-    after dt $ EvCastComplete sid aid
+    after 0  $ EvCastStarted sid aid
+    after dt $ EvCastComplete sid aid -- This needs to be removed if the cast is interrupted.
     where
-        handler sid (EvCastComplete eid aid) =
+        handler sid (EvCastComplete eid aid) = do
+            modifySource . setL eCast $ Nothing
             if (eid == sid) && (getL abilName abil) == aid
-            then do getL abilAction abil
-                    sid <- getL eID <$> getSource
-                    removeHandler (show sid ++ show aid)
-            else return ()
+                then do getL abilAction abil
+                        sid <- getL eID <$> getSource
+                        removeHandler (show sid ++ show aid)
+                else return ()
         handler _   _ = return ()
 
 addBuff :: ((:->) Entity BuffList) -> BuffId -> Buff -> Action ()
 addBuff cat bid buff = modifySource $ modL cat (addBuffToList bid buff)
 
+
 addSourceAura :: Aura -> Action ()
 addSourceAura a = do
     modifySource . modL eAuras . addAuraToList $ a
     sid <- getL eID <$> getSource
+    doIn (getL auraDuration a) $ removeSourceAura (getL auraId a)
     after 0 (EvAuraApplied sid sid (getL auraId a))
 
 addTargetAura :: Aura -> Action ()
@@ -187,4 +199,28 @@ addTargetAura a = do
     modifyTarget . modL eAuras . addAuraToList $ a
     sid <- getL eID <$> getSource
     tid <- getL eID <$> getTarget
+    doIn (getL auraDuration a) $ removeTargetAura (getL auraId a)
     after 0 (EvAuraApplied sid tid (getL auraId a))
+
+
+removeSourceAura :: AuraId -> Action ()
+removeSourceAura aid = do
+    modifySource . modL eAuras . removeAuraFromList $ aid
+    sid <- getL eID <$> getSource
+    after 0 (EvAuraExpire sid sid aid)
+
+removeTargetAura :: AuraId -> Action ()
+removeTargetAura aid = do
+    modifyTarget . modL eAuras . removeAuraFromList $ aid
+    sid <- getL eID <$> getSource
+    tid <- getL eID <$> getTarget
+    after 0 (EvAuraExpire sid tid aid)
+
+doIn :: DTime -> Action () -> Action ()
+doIn dt act = do
+    readerst <- ask
+    let simAct = runReaderT act readerst
+    after dt (EvAction simAct)
+
+doNothing :: Action ()
+doNothing = return ()

@@ -4,6 +4,8 @@ module Types.Common  where
 import DisEvSim (Time, DTime, Sim)
 import Data.Map (Map(..), keys, elems)
 import Control.Monad.Reader
+import Data.Maybe (fromMaybe)
+import System.Random
 
 -- For Data/Typable
 import Data.Data
@@ -15,7 +17,7 @@ import Text.Printf (printf)
 -- For labels
 import Language.Haskell.TH
 import Data.Record.Label
-import System.Random
+
 import qualified Control.Category as Cat
 
 a <.> b = (Cat..) a b
@@ -46,8 +48,8 @@ instance Show AuraId where
     show (AuraId name) = "Aura." ++ name
 
 -- ** Monads
-data ActionState = ActionState { _actionSource :: Entity
-                               , _actionTarget :: Entity
+data ActionState = ActionState { _actionSource :: EntityId
+                               , _actionTarget :: EntityId
                                } deriving (Show)
 
 type Action = ReaderT ActionState (Sim World Event)
@@ -67,17 +69,17 @@ type BuffList = Map BuffId Buff
 -- ** Entity
 type EntityMap = Map EntityId Entity
 
-data Entity = Entity { _eID         :: !EntityId
-                     , _eTarget     :: !EntityId
-                     , _eHealth     :: !Health
-                     , _eGlobalCD   :: !Time
-                     , _eCast       :: Maybe (Ability, Time)
-                     , _eCooldowns  :: Map AbilityId Time
-                     , _eStats      :: Stats
-                     , _eBaseStats  :: Stats
-                     , _eAuras      :: AuraList
-                     , _eAI         :: Handler
-                     , _eHandlers   :: HandlerList
+data Entity = Entity { _eID             :: !EntityId
+                     , _eTarget         :: !EntityId
+                     , _eHealth         :: !Health
+                     , _eGlobalCD       :: !Time
+                     , _eCast           :: Maybe (Ability, Time)
+                     , _eCooldowns      :: Map AbilityId Time
+                     , _eStats          :: Stats
+                     , _eBaseStats      :: Stats
+                     , _eAuras          :: AuraList
+                     , _eAI             :: Handler
+                     , _eHandlers       :: HandlerList
                      , _eAttFlatBuffs   :: BuffList
                      , _eAttMultBuffs   :: BuffList
                      , _ePriFlatBuffs   :: BuffList
@@ -88,12 +90,12 @@ data Entity = Entity { _eID         :: !EntityId
 
 instance Show Entity where
     show (Entity id targ health gcd cast cds stats bStats auras ai hs buffs _ _ _ _ _) =
-        printf "Entity { eId = \"%s\", eTarget = \"%s\", eHealth = %d, eGlobalCD = %f, eCast = %d, eCooldowns = %s, eStats = %s, eAuras = %s, eHandlers = %s, eBuffs = %s }"
+        printf "Entity { eId = %s, eTarget = %s, eHealth = %d, eGlobalCD = %f, eCast = %f, eCooldowns = %s, eStats = %s, eAuras = %s, eHandlers = %s, eBuffs = %s }"
             (show id)
             (show targ)
             health
             gcd
-            (show $ snd `fmap` cast)
+            (fromMaybe 0.0 (snd `fmap` cast))
             (show cds)
             (show stats)
             (show . elems $ auras)
@@ -107,6 +109,8 @@ data World = World { _wEntities :: EntityMap
                    } deriving (Show)
 
 data Event = EvSimStart
+           | EvMessage String
+           | EvAction (Sim World Event ())
            | EvGcdEnd EntityId
            | EvCooldownExpire EntityId AbilityId
            -- Autoattack start/stop ready

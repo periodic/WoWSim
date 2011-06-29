@@ -30,7 +30,6 @@ logAttack name res = do
         ResultParry     -> after 0 $ EvParry sid tid name
         ResultDodge     -> after 0 $ EvDodge sid tid name
         ResultMiss      -> after 0 $ EvMiss  sid tid name
-    
 
 startAutoAttack :: Action ()
 startAutoAttack = do

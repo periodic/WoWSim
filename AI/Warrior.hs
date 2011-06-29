@@ -6,20 +6,28 @@ import AI.Info
 import Actions.Common
 import Actions.Attacks
 
+import Control.Monad.Reader
+
 warrior :: Event -> Action ()
 warrior (EvSimStart)            = startAutoAttack >> rotation
 warrior (EvGcdEnd _)            = rotation
 warrior (EvCooldownExpire _ _)  = rotation
+warrior (EvCastComplete   _ _)  = rotation
 warrior _                       = return ()
 
 rotation = do
     ingcd <- onGCD
+    casting <- iAmCasting
     oncd  <- abilOnCooldown msName
-    if ingcd
+    if ingcd || casting
         then return()
-        else if oncd
-            then useAbility slam
-            else useAbility mortalStrike
+        else do
+            hasRend <- targetHasAura rendDebuff
+            if not hasRend
+                then useAbility rend
+                else if oncd
+                    then useAbility slam
+                    else useAbility mortalStrike
     where
         msName = AbilityId "MortalStrike"
         mortalStrike =
@@ -35,11 +43,12 @@ rotation = do
             Ability { _abilName       = slamName
                     , _abilCooldown   = Nothing
                     , _abilTriggerGCD = True
-                    , _abilCastTime   = 1.5
+                    , _abilCastTime   = 2.0
                     , _abilSchool     = Physical
                     , _abilAction     = weapon slamName 1 100
                     }
         rendName = AbilityId "Rend"
+        rendDebuff = AuraId "Rend"
         rend = 
             Ability { _abilName       = rendName
                     , _abilCooldown   = Nothing
@@ -48,14 +57,18 @@ rotation = do
                     , _abilSchool     = Physical
                     , _abilAction     = do
                         addTargetAura rendAura
-                        addHandler "Rend" rendHandler
+                        doIn 3 rendHandler
                     }
-        rendHandler :: Event -> Action ()
-        rendHandler (EvAuraExpire _ _ (AuraId "Rend")) = removeHandler "Rend"
+        rendHandler :: Action ()
+        rendHandler = do
+            hasRend <- targetHasAura rendDebuff
+            if hasRend
+                then attack rendName 100 >> doIn 3 rendHandler
+                else doNothing
         -- Rend needs to:
         --   Remove it's handler on expiry?
         --   Be able to trigger events at intervals that other handlers don't need to see.
-        rendAura = Aura { _auraId          = AuraId "Rend"
+        rendAura = Aura { _auraId          = rendDebuff
                         , _auraOwner       = EntityId "SET ME!"
                         , _auraSchool      = Physical
                         , _auraType        = DebuffBleed
