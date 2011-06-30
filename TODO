@@ -2,6 +2,6 @@
 * Each entity has their own handler list
 * Use temporary stats for all calculations, perhaps in the action setup.
 * add-buff function
+* Aura durations.  Automatically remove auras after their duration expires.
 
-- Aura durations.  Automatically remove auras after their duration expires.
 - Auras need their owners dynamically set.  Need to have the information available in their handlers.

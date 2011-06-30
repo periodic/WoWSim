@@ -4,6 +4,7 @@ import Types.World
 import Types.Stats
 
 import Actions.Common
+import AI.Info
 
 attack :: AbilityId -> Damage -> Action ()
 attack abilName dmg = do
@@ -39,10 +40,13 @@ startAutoAttack = do
     after 0 (EvAutoAttackReady owner)
     where
         name = AbilityId "AutoAttack"
-        autoAttackHandler owner (EvAutoAttackReady eid) 
-            | eid == owner = do 
-                delay <- getL (weaponSpeed <.> eStats) <$> getSource
-                weapon name 1.0 0
-                after delay (EvAutoAttackReady owner)
-            | otherwise = return ()
-        autoAttackHandler _ _ = return ()
+        autoAttackHandler owner _ = do
+                canAttack <- iCanAutoAttack
+                if canAttack
+                    then do
+                        delay <- getL (weaponSpeed <.> eStats) <$> getSource
+                        t     <- getTime
+                        after delay (EvAutoAttackReady owner)
+                        modifySource . setL eAutoAttackCD $ t + delay
+                        weapon name 1.0 0
+                    else return ()

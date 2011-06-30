@@ -29,11 +29,16 @@ main = do
                         }
         config  = defaultConfig { enableLog = True }
         (t, log, world') = {-# SCC "sim" #-} simulate config world [("Core Handler", execActions)] EvSimStart (read dur)
-    putStrLn . showLog $ log
+        logLen  = length log
+    -- Print the log if it has less than 200 entries.
+    if logLen < 200
+        then putStrLn . showLog $ log
+        else return ()
+    -- Print the summary values
     let tFinal = Map.lookup (EntityId "Target") . getL wEntities $ world'
     case tFinal of
-        Just targ -> print $ (t, getL eHealth targ)
-        Nothing   -> print $ (t)
+        Just targ -> print $ (t, length log, getL eHealth targ)
+        Nothing   -> print $ (t, length log)
 
 showLog :: [(Time, Event)] -> String
 showLog = intercalate "\n" . map (\(t,e) -> show t ++ " - " ++ show e)

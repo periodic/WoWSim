@@ -73,6 +73,7 @@ data Entity = Entity { _eID             :: !EntityId
                      , _eTarget         :: !EntityId
                      , _eHealth         :: !Health
                      , _eGlobalCD       :: !Time
+                     , _eAutoAttackCD   :: !Time
                      , _eCast           :: Maybe (Ability, Time)
                      , _eCooldowns      :: Map AbilityId Time
                      , _eStats          :: Stats
@@ -89,12 +90,13 @@ data Entity = Entity { _eID             :: !EntityId
                      }
 
 instance Show Entity where
-    show (Entity id targ health gcd cast cds stats bStats auras ai hs buffs _ _ _ _ _) =
-        printf "Entity { eId = %s, eTarget = %s, eHealth = %d, eGlobalCD = %f, eCast = %f, eCooldowns = %s, eStats = %s, eAuras = %s, eHandlers = %s, eBuffs = %s }"
+    show (Entity id targ health gcd aacd cast cds stats bStats auras ai hs buffs _ _ _ _ _) =
+        printf "Entity { eId = %s, eTarget = %s, eHealth = %d, eGlobalCD = %f, eAutoAttackCD = %f, eCast = %f, eCooldowns = %s, eStats = %s, eAuras = %s, eHandlers = %s, eBuffs = %s }"
             (show id)
             (show targ)
             health
             gcd
+            aacd
             (fromMaybe 0.0 (snd `fmap` cast))
             (show cds)
             (show stats)

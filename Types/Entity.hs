@@ -25,17 +25,18 @@ import Types.Handler
 
 
 -- |Create a default entity.
-makeEntity name targ ai = Entity { _eID          = EntityId name
-                                 , _eTarget      = EntityId targ
-                                 , _eHealth      = 0
-                                 , _eGlobalCD    = 0
-                                 , _eCast        = Nothing
-                                 , _eCooldowns   = empty
-                                 , _eStats       = defaultStats
-                                 , _eBaseStats   = defaultStats
-                                 , _eAuras       = emptyAuraList
-                                 , _eAI          = ai
-                                 , _eHandlers    = emptyHandlerList
+makeEntity name targ ai = Entity { _eID             = EntityId name
+                                 , _eTarget         = EntityId targ
+                                 , _eHealth         = 0
+                                 , _eGlobalCD       = 0
+                                 , _eAutoAttackCD   = 0
+                                 , _eCast           = Nothing
+                                 , _eCooldowns      = empty
+                                 , _eStats          = defaultStats
+                                 , _eBaseStats      = defaultStats
+                                 , _eAuras          = emptyAuraList
+                                 , _eAI             = ai
+                                 , _eHandlers       = emptyHandlerList
                                  , _eAttFlatBuffs   = addBuffToList "default" defaultAttributeAdditive emptyBuffList
                                  , _eAttMultBuffs   = addBuffToList "default" defaultAttributeMult     emptyBuffList
                                  , _ePriFlatBuffs   = addBuffToList "default" defaultPrimaryAdditive   emptyBuffList

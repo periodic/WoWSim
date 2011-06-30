@@ -32,3 +32,11 @@ iAmCasting = do
     case (getL eCast s) of
         Just (_, ct) -> return (ct > t)
         Nothing      -> return False
+
+iCanAutoAttack :: Action Bool
+iCanAutoAttack = do
+    casting <- iAmCasting
+    s <- getSource
+    t <- getTime
+    return (not casting && getL eAutoAttackCD s <= t)
+
