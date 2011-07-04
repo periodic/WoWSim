@@ -47,6 +47,10 @@ newtype AuraId = AuraId String deriving (Eq, Ord)
 instance Show AuraId where
     show (AuraId name) = "Aura." ++ name
 
+newtype TalentId = TalentId String deriving (Eq, Ord)
+instance Show TalentId where
+    show (TalentId name) = "Talent." ++ name
+
 -- ** Monads
 data ActionState = ActionState { _actionSource :: EntityId
                                , _actionTarget :: EntityId
@@ -167,11 +171,18 @@ data Aura = Aura { _auraId          :: AuraId
                  , _auraDuration    :: DTime
                  } deriving (Show)
 
-{-
-instance Show Aura where
-    show (Aura name owner school type duration _ _) = printf "Aura.%s.%s" (show owner) (show name)
-    -}
+-- * Talents
+{- | Talents are essentially just one-time actions.  They get run before sim
+ - start to set everything up.  They usually add additional action handlers or
+ - passive buffs.
+ -}
 
+type TalentList = [(Integer, TalentId)]
+type TalentMap  = Map TalentId Talent
+
+data Talent = Talent { _talentId     :: TalentId
+                     , _talentAction :: Integer -> Action ()
+                     }
 
 -- * Function types
 
@@ -303,4 +314,4 @@ data Stats = Stats { _level              :: Integer
                    , _spellMult          :: Float
                    } deriving (Show)
 
-$(mkLabels [''Ability, ''Action, ''ActionState, ''Entity, ''World, ''Stats, ''Aura])
+$(mkLabels [''Ability, ''Action, ''ActionState, ''Aura, ''Entity, ''Stats, ''Talent, ''World])

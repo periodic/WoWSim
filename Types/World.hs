@@ -22,6 +22,8 @@ module Types.World ( module Types.Common
                    -- From Types.Handler
                    , addHandlerToList
                    , removeHandlerFromList
+                   -- From Types.Talents
+                   , applyTalents
                    -- DisEvSim
                    , DTime
                    , Time
@@ -42,6 +44,7 @@ import Types.Entity
 import Types.EntityId
 import Types.Event
 import Types.Handler
+import Types.Talents
 
 import DisEvSim (DTime, Time, Sim)
 import Data.Record.Label (getL, modL, setL)

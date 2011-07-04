@@ -5,3 +5,9 @@
 * Aura durations.  Automatically remove auras after their duration expires.
 
 - Auras need their owners dynamically set.  Need to have the information available in their handlers.
+
+-- Talents
+- Put abilities in a Map AbilityId Ability in the world state.
+- Talents put in a Map TalentId Talent.
+- Talents need to be automatically loaded before the real sim starts.
+- Allow configuration of talents in WoWSim from [(Integer, String)]

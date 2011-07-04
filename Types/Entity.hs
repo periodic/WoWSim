@@ -7,6 +7,7 @@ module Types.Entity ( Entity(..)
                     , addEntityList
                     , updateEntityList
                     , lookupEntityInList
+                    , lookupEntityById
                     , adjustEntityInList
                     ) where
 
@@ -53,9 +54,13 @@ addEntityList e map = insert (getL eID e) e map
 updateEntityList :: Entity -> EntityMap -> EntityMap
 updateEntityList e map = insert (getL eID e) e map
 
--- |Update an entity, replacing the old entity with the new one.
+-- |Lookup an entity by the entity itself.  Good for getting an updated version.
 lookupEntityInList :: Entity -> EntityMap -> Maybe Entity
 lookupEntityInList e map = lookup (getL eID e) map
+
+-- |Look up an entity by entityId.
+lookupEntityById :: EntityId -> EntityMap -> Maybe Entity
+lookupEntityById eid map = lookup eid map
 
 -- |Adjust an entity in the list
 adjustEntityInList :: (Entity -> Entity) -> EntityId -> EntityMap -> EntityMap

@@ -7,6 +7,7 @@ import Actions.Common
 import Actions.Attacks
 
 import Control.Monad.Reader
+import Data.Map (empty)
 
 warrior :: Event -> Action ()
 warrior (EvSimStart)            = startAutoAttack >> rotation
@@ -74,3 +75,9 @@ rotation = do
                         , _auraType        = DebuffBleed
                         , _auraDuration    = 15
                         }
+
+defaultWarriorTalents :: TalentList
+defaultWarriorTalents = []
+
+warriorTalentMap :: TalentMap
+warriorTalentMap = empty
