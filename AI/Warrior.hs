@@ -7,7 +7,7 @@ import Actions.Common
 import Actions.Attacks
 
 import Control.Monad.Reader
-import Data.Map (empty)
+import Data.Map (empty, fromList)
 
 warrior :: Event -> Action ()
 warrior (EvSimStart)            = startAutoAttack >> rotation
@@ -77,7 +77,7 @@ rotation = do
                         }
 
 defaultWarriorTalents :: TalentList
-defaultWarriorTalents = []
+defaultWarriorTalents = [(TalentId "Test Talent", 3)]
 
 warriorTalentMap :: TalentMap
-warriorTalentMap = empty
+warriorTalentMap = fromList [(TalentId "Test Talent", Talent (TalentId "Test Talent") (const $ modL (strength <.> eBaseStats) (+100)))]

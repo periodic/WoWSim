@@ -10,17 +10,14 @@ import DisEvSim (Sim, getW)
 import Types.Common
 import Types.Entity
 
-applyTalents :: TalentMap -> TalentList -> EntityId -> World -> World
-applyTalents tmap talents sid w =
-    case lookupEntityById sid . getL wEntities $ w of
-        Nothing      -> w
-        Just pEntity -> (foldr (.) id 
-                      . map (uncurry applyTalent) $ talents)
-                      $ w
+applyTalents :: TalentMap -> TalentList -> Entity -> Entity
+applyTalents tmap talents e = 
+    let efunc = foldr (.) id . map (uncurry applyTalent) $ talents
+     in efunc e
     where
-        applyTalent :: TalentId -> Integer -> World -> World
+        applyTalent :: TalentId -> Integer -> Entity -> Entity
         applyTalent tid p = maybe (id)
-                                  (\t -> (getL talentEffect t) sid p)
+                                  (\t -> (getL talentEffect t) p)
                                   (lookupTalent tid tmap)
 
 

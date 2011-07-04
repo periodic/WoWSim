@@ -19,13 +19,12 @@ import AI.Warrior
 main = do
     [dur]   <- getArgs
     gen     <- newStdGen
-    let pEntity = makeEntity "Player" "Target" warrior
+    let pEntity = applyTalents warriorTalentMap defaultWarriorTalents $ makeEntity "Player" "Target" warrior
         tEntity = makeEntity "Target" "Player" nullHandler
         pID     = getL eID pEntity
         entities = addEntityList pEntity . addEntityList tEntity $ empty
         -- TODO: move this to Types.World
-        world   = applyTalents warriorTalentMap defaultWarriorTalents pID
-                  World { _wEntities = entities
+        world   = World { _wEntities = entities
                         , _wGen      = gen
                         }
         config  = defaultConfig { enableLog = True }
