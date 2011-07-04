@@ -10,17 +10,18 @@ import DisEvSim (Sim, getW)
 import Types.Common
 import Types.Entity
 
-applyTalents :: TalentMap -> TalentList -> EntityId -> Sim World Event ()
-applyTalents tmap talents sid = do
-    w <- getW
+applyTalents :: TalentMap -> TalentList -> EntityId -> World -> World
+applyTalents tmap talents sid w =
     case lookupEntityById sid . getL wEntities $ w of
-        Nothing      -> return ()
-        Just pEntity -> sequence_ $ applyList (getL eID pEntity) (getL eTarget pEntity) tmap talents
+        Nothing      -> w
+        Just pEntity -> (foldr (.) id 
+                      . map (uncurry applyTalent) $ talents)
+                      $ w
     where
-        talent2Sim :: EntityId -> EntityId -> Integer -> (Integer -> Action ()) -> Sim World Event ()
-        talent2Sim sid tid i t = (flip runReaderT) (ActionState sid tid) $ t i
-        applyList :: EntityId -> EntityId -> TalentMap -> TalentList -> [Sim World Event ()]
-        applyList sid tid tmap = map (\(p, t) -> maybe (return ()) (talent2Sim sid tid p . getL talentAction) (lookupTalent t tmap))
+        applyTalent :: TalentId -> Integer -> World -> World
+        applyTalent tid p = maybe (id)
+                                  (\t -> (getL talentEffect t) sid p)
+                                  (lookupTalent tid tmap)
 
 
 lookupTalent :: TalentId -> TalentMap -> Maybe Talent

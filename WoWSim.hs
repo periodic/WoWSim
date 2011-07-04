@@ -24,7 +24,8 @@ main = do
         pID     = getL eID pEntity
         entities = addEntityList pEntity . addEntityList tEntity $ empty
         -- TODO: move this to Types.World
-        world   = World { _wEntities = entities
+        world   = applyTalents warriorTalentMap defaultWarriorTalents pID
+                  World { _wEntities = entities
                         , _wGen      = gen
                         }
         config  = defaultConfig { enableLog = True }

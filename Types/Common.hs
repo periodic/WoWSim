@@ -177,11 +177,12 @@ data Aura = Aura { _auraId          :: AuraId
  - passive buffs.
  -}
 
-type TalentList = [(Integer, TalentId)]
+type TalentEffect = EntityId -> Integer -> World -> World
+type TalentList = [(TalentId, Integer)]
 type TalentMap  = Map TalentId Talent
 
 data Talent = Talent { _talentId     :: TalentId
-                     , _talentAction :: Integer -> Action ()
+                     , _talentEffect :: TalentEffect
                      }
 
 -- * Function types
