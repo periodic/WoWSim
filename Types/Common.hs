@@ -85,6 +85,7 @@ data Entity = Entity { _eID             :: !EntityId
                      , _eAuras          :: AuraList
                      , _eAI             :: Handler
                      , _eHandlers       :: HandlerList
+                     , _eAbilities      :: AbilityMap
                      , _eAttFlatBuffs   :: BuffList
                      , _eAttMultBuffs   :: BuffList
                      , _ePriFlatBuffs   :: BuffList
@@ -94,8 +95,8 @@ data Entity = Entity { _eID             :: !EntityId
                      }
 
 instance Show Entity where
-    show (Entity id targ health gcd aacd cast cds stats bStats auras ai hs buffs _ _ _ _ _) =
-        printf "Entity { eId = %s, eTarget = %s, eHealth = %d, eGlobalCD = %f, eAutoAttackCD = %f, eCast = %f, eCooldowns = %s, eStats = %s, eAuras = %s, eHandlers = %s, eBuffs = %s }"
+    show (Entity id targ health gcd aacd cast cds stats bStats auras ai hs abils _ _ _ _ _ _) =
+        printf "Entity { eId = %s, eTarget = %s, eHealth = %d, eGlobalCD = %f, eAutoAttackCD = %f, eCast = %f, eCooldowns = %s, eStats = %s, eAuras = %s, eHandlers = %s, eAbilities = %s }"
             (show id)
             (show targ)
             health
@@ -106,7 +107,7 @@ instance Show Entity where
             (show stats)
             (show . elems $ auras)
             (show . keys $ hs)
-            (show . keys $ buffs)
+            (show . keys $ abils)
 
 
 

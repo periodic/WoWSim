@@ -17,6 +17,7 @@ import DisEvSim (DTime, Time)
 import Data.Map
 import Data.Record.Label
 
+import Types.Ability
 import Types.Aura
 import Types.Buff
 import Types.Common
@@ -26,25 +27,26 @@ import Types.Handler
 
 
 -- |Create a default entity.
-makeEntity name targ ai = Entity { _eID             = EntityId name
-                                 , _eTarget         = EntityId targ
-                                 , _eHealth         = 0
-                                 , _eGlobalCD       = 0
-                                 , _eAutoAttackCD   = 0
-                                 , _eCast           = Nothing
-                                 , _eCooldowns      = empty
-                                 , _eStats          = defaultStats
-                                 , _eBaseStats      = defaultStats
-                                 , _eAuras          = emptyAuraList
-                                 , _eAI             = ai
-                                 , _eHandlers       = emptyHandlerList
-                                 , _eAttFlatBuffs   = addBuffToList "default" defaultAttributeAdditive emptyBuffList
-                                 , _eAttMultBuffs   = addBuffToList "default" defaultAttributeMult     emptyBuffList
-                                 , _ePriFlatBuffs   = addBuffToList "default" defaultPrimaryAdditive   emptyBuffList
-                                 , _ePriMultBuffs   = addBuffToList "default" defaultPrimaryMult       emptyBuffList
-                                 , _eSecFlatBuffs   = addBuffToList "default" defaultSecondaryAdditive emptyBuffList
-                                 , _eSecMultBuffs   = addBuffToList "default" defaultSecondaryMult     emptyBuffList
-                                 }
+makeEntity name targ ai abils = Entity { _eID             = EntityId name
+                                       , _eTarget         = EntityId targ
+                                       , _eHealth         = 0
+                                       , _eGlobalCD       = 0
+                                       , _eAutoAttackCD   = 0
+                                       , _eCast           = Nothing
+                                       , _eCooldowns      = empty
+                                       , _eStats          = defaultStats
+                                       , _eBaseStats      = defaultStats
+                                       , _eAuras          = emptyAuraList
+                                       , _eAI             = ai
+                                       , _eHandlers       = emptyHandlerList
+                                       , _eAbilities      = abils
+                                       , _eAttFlatBuffs   = addBuffToList "default" defaultAttributeAdditive emptyBuffList
+                                       , _eAttMultBuffs   = addBuffToList "default" defaultAttributeMult     emptyBuffList
+                                       , _ePriFlatBuffs   = addBuffToList "default" defaultPrimaryAdditive   emptyBuffList
+                                       , _ePriMultBuffs   = addBuffToList "default" defaultPrimaryMult       emptyBuffList
+                                       , _eSecFlatBuffs   = addBuffToList "default" defaultSecondaryAdditive emptyBuffList
+                                       , _eSecMultBuffs   = addBuffToList "default" defaultSecondaryMult     emptyBuffList
+                                       }
 
 -- |Add an entity to the entity map.
 addEntityList :: Entity -> EntityMap -> EntityMap

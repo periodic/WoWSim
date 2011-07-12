@@ -150,18 +150,22 @@ setCooldown name dt =
         modifySource (entityAddCooldown name (t + dt))
         after dt (EvCooldownExpire (getL eID src) name)
 
-useAbility :: Ability -> Action ()
-useAbility abil = do
-    if (getL abilTriggerGCD abil)
-        then resetGCD
-        else return ()
-    case (getL abilCooldown abil) of
+useAbility :: AbilityId -> Action ()
+useAbility aid = do
+    src <- getSource
+    case getAbilityFromMap aid . getL eAbilities $ src of
         Nothing -> return ()
-        Just dt -> setCooldown (getL abilName abil) dt
-    ct <- getAbilCastTime abil
-    if ct <= 0
-        then getL abilAction abil
-        else registerCast ct abil
+        Just abil -> do
+            if (getL abilTriggerGCD abil)
+                then resetGCD
+                else return ()
+            case (getL abilCooldown abil) of
+                Nothing -> return ()
+                Just dt -> setCooldown (getL abilName abil) dt
+            ct <- getAbilCastTime abil
+            if ct <= 0
+                then getL abilAction abil
+                else registerCast ct abil
 
 registerCast :: DTime -> Ability -> Action ()
 registerCast dt abil= do

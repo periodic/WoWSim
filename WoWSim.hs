@@ -19,8 +19,8 @@ import AI.Warrior
 main = do
     [dur]   <- getArgs
     gen     <- newStdGen
-    let pEntity = applyTalents warriorTalentMap defaultWarriorTalents $ makeEntity "Player" "Target" warrior
-        tEntity = makeEntity "Target" "Player" nullHandler
+    let pEntity = applyTalents warriorTalentMap defaultWarriorTalents $ makeEntity "Player" "Target" warrior warriorAbilities
+        tEntity = makeEntity "Target" "Player" nullHandler empty
         pID     = getL eID pEntity
         entities = addEntityList pEntity . addEntityList tEntity $ empty
         -- TODO: move this to Types.World

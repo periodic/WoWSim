@@ -11,6 +11,9 @@ module Types.World ( module Types.Common
                    , makeEntity
                    -- From Types.Ability
                    , realAbilCastTime
+                   , addAbilityToMap
+                   , getAbilityFromMap
+                   , emptyAbilityMap
                    -- From Types.Aura
                    , addAuraToList
                    , removeAuraFromList
